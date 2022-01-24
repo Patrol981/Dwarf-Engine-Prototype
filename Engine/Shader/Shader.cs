@@ -13,52 +13,24 @@ namespace Voxelized.Shaders;
 
 public class Shader {
   private protected int _handle;
+  private Dictionary<string, int> _uniformLocations;
   private bool _disposed = false;
-
-  public Shader(string vertexPath, string fragmentPath) {
-    LoadShaders(vertexPath,fragmentPath);
-  }
 
   ~Shader() {
     GL.DeleteProgram(_handle);
   }
 
-  public void Use() {
-    GL.UseProgram(_handle);
-  }
+  public Shader(string vertexPath, string fragmentPath) {
+    var vertexShaderSource = File.ReadAllText(vertexPath);
+    var fragmentShaderSource = File.ReadAllText(fragmentPath);
 
-  private void LoadShaders(string vertexPath, string fragmentPath) {
-    string vertexShaderSource;
-    string fragmentShaderSource;
-
-    using (StreamReader reader = new StreamReader(vertexPath, Encoding.UTF8)) {
-      vertexShaderSource = reader.ReadToEnd();
-    }
-
-    using (StreamReader reader = new StreamReader(fragmentPath, Encoding.UTF8)) {
-      fragmentShaderSource = reader.ReadToEnd();
-    }
-
-    int vertexShader = GL.CreateShader(ShaderType.VertexShader);
+    var vertexShader = GL.CreateShader(ShaderType.VertexShader);
     GL.ShaderSource(vertexShader, vertexShaderSource);
+    CompileShader(vertexShader);
 
-    int fragmentShader = GL.CreateShader(ShaderType.FragmentShader);
+    var fragmentShader = GL.CreateShader(ShaderType.FragmentShader);
     GL.ShaderSource(fragmentShader, fragmentShaderSource);
-
-    string infoLogVertex = System.String.Empty;
-    string infoLogFragment = System.String.Empty;
-
-    GL.CompileShader(vertexShader);
-    GL.GetShaderInfoLog(vertexShader, out infoLogVertex);
-    if(infoLogVertex != System.String.Empty) {
-      System.Console.Write(infoLogVertex);
-    }
-
-    GL.CompileShader(fragmentShader);
-    GL.GetShaderInfoLog(fragmentShader, out infoLogFragment);
-    if(infoLogFragment != System.String.Empty) {
-      System.Console.Write(infoLogFragment);
-    }
+    CompileShader(fragmentShader);
 
     _handle = GL.CreateProgram();
 
@@ -72,6 +44,87 @@ public class Shader {
     GL.DetachShader(_handle, fragmentShader);
     GL.DeleteShader(vertexShader);
     GL.DeleteShader(fragmentShader);
+
+    GL.GetProgram(_handle, GetProgramParameterName.ActiveUniforms, out var uniformsNumber);
+    _uniformLocations = new Dictionary<string, int>();
+
+    for(var i=0; i<uniformsNumber; i++) {
+      var key = GL.GetActiveUniform(_handle, i, out _, out _);
+      var location = GL.GetUniformLocation(_handle, key);
+      _uniformLocations.Add(key, location);
+    }
+  }
+
+  public void Use() {
+    GL.UseProgram(_handle);
+  }
+
+  private static void CompileShader(int shader) {
+    GL.CompileShader(shader);
+
+    GL.GetShader(shader, ShaderParameter.CompileStatus, out var code);
+    if(code != (int)All.True) {
+      var infoLog = GL.GetShaderInfoLog(shader);
+      throw new Exception($"Error occurred whilst compiling Shader({shader}).\n\n{infoLog}");
+    }
+  }
+
+  private static void LinkProgram(int program) {
+    GL.LinkProgram(program);
+
+    GL.GetProgram(program, GetProgramParameterName.LinkStatus, out var code);
+    if (code != (int)All.True) {
+      throw new Exception($"Error occurred whilst linking Program({program})");
+    }
+  }
+
+  public int GetAttribLocation(string attribName) {
+    return GL.GetAttribLocation(_handle, attribName);
+  }
+
+  /// <summary>
+  /// Set a uniform int on this shader.
+  /// </summary>
+  /// <param name="name">The name of the uniform</param>
+  /// <param name="data">The data to set</param>
+  public void SetInt(string name, int data) {
+    GL.UseProgram(_handle);
+    GL.Uniform1(_uniformLocations[name], data);
+  }
+
+  /// <summary>
+  /// Set a uniform float on this shader.
+  /// </summary>
+  /// <param name="name">The name of the uniform</param>
+  /// <param name="data">The data to set</param>
+  public void SetFloat(string name, float data) {
+    GL.UseProgram(_handle);
+    GL.Uniform1(_uniformLocations[name], data);
+  }
+
+  /// <summary>
+  /// Set a uniform Matrix4 on this shader
+  /// </summary>
+  /// <param name="name">The name of the uniform</param>
+  /// <param name="data">The data to set</param>
+  /// <remarks>
+  ///   <para>
+  ///   The matrix is transposed before being sent to the shader.
+  ///   </para>
+  /// </remarks>
+  public void SetMatrix4(string name, Matrix4 data) {
+    GL.UseProgram(_handle);
+    GL.UniformMatrix4(_uniformLocations[name], true, ref data);
+  }
+
+  /// <summary>
+  /// Set a uniform Vector3 on this shader.
+  /// </summary>
+  /// <param name="name">The name of the uniform</param>
+  /// <param name="data">The data to set</param>
+  public void SetVector3(string name, Vector3 data) {
+    GL.UseProgram(_handle);
+    GL.Uniform3(_uniformLocations[name], data);
   }
 
   protected virtual void Dispose(bool disposing) {

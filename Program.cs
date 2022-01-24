@@ -10,8 +10,8 @@ using Voxelized.Callbacks;
 class Program {
   unsafe static void Main() {
     using (var window = new Voxelized.Windowing.Window(GameWindowSettings.Default, WindowSettings.GetNativeWindowSettings())) {
-      GLFW.SetKeyCallback(window.WindowPtr, KeyCallback.OnKeyPressed);
-      GLFW.SetMouseButtonCallback(window.WindowPtr, MouseCallback.OnMousePressed);
+      // GLFW.SetKeyCallback(window.WindowPtr, KeyCallback.OnKeyPressed);
+      // GLFW.SetMouseButtonCallback(window.WindowPtr, MouseCallback.OnMousePressed);
       window.Run();
     }
 
