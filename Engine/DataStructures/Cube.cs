@@ -9,17 +9,12 @@ using Voxelized.Textures;
 using Voxelized.Shaders;
 using Voxelized.Globals;
 
-using Voxelized.Cameras;
-using Voxelized.ECS;
+namespace Voxelized.DataStructures;
 
-namespace Voxelized.Challanges;
-
-public class CubesTest : Component {
+public class Cube {
   private readonly Shader _shader;
-  private readonly Texture _texture, _texture2;
-
   private readonly float[] _vertices = {
-    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+   -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
      0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
      0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
      0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
@@ -60,54 +55,23 @@ public class CubesTest : Component {
      0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
     -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
     -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-};
+  };
 
   private readonly uint[] _indices = {
     0, 1, 3,
     1, 2, 3
   };
 
-  private readonly Vector3[] _cubePositions = {
-    new Vector3(0, 0, 0),
-    new Vector3(1, 0, 0),
-    new Vector3(2, 0, 0),
-    // new Vector3(3, 0, 0),
-    new Vector3(4, 0, 0),
-
-    // new Vector3(0, 1, 0),
-    // new Vector3(1, 1, 0),
-    new Vector3(2, 1, 0),
-    // new Vector3(3, 1, 0),
-    new Vector3(4, 1, 0),
-
-    new Vector3(0, 2, 0),
-    new Vector3(1, 2, 0),
-    new Vector3(2, 2, 0),
-    new Vector3(3, 2, 0),
-    new Vector3(4, 2, 0),
-
-    new Vector3(0, 3, 0),
-    // new Vector3(1, 3, 0),
-    new Vector3(2, 3, 0),
-    // new Vector3(3, 3, 0),
-    // new Vector3(4, 3, 0),
-
-    new Vector3(0, 4, 0),
-    // new Vector3(1, 4, 0),
-    new Vector3(2, 4, 0),
-    new Vector3(3, 4, 0),
-    new Vector3(4, 4, 0)
-  };
+  private Texture _texture;
+  private string _textureSlot;
+  private Vector3 _position;
 
   private int _vbo, _vao, _ebo;
 
-  private float _rotation;
-  private bool _textureSwitch = false;
-
-  public CubesTest() {}
-
-  public CubesTest(Shader shader) {
+  public Cube(Shader shader, string textureName, string textureSlot) {
     _shader = shader;
+
+    _textureSlot = textureSlot;
 
     _vao = GL.GenVertexArray();
     GL.BindVertexArray(_vao);
@@ -120,50 +84,38 @@ public class CubesTest : Component {
     GL.BindBuffer(BufferTarget.ElementArrayBuffer, _ebo);
     GL.BufferData(BufferTarget.ElementArrayBuffer, _indices.Length * sizeof(uint), _indices, BufferUsageHint.StaticDraw);
 
-    _shader.Use();
-
-    var vertexLocation = _shader.GetAttribLocation("aCubePosition");
+    var vertexLocation = _shader.GetAttribLocation("aPosition");
     GL.EnableVertexAttribArray(vertexLocation);
     GL.VertexAttribPointer(vertexLocation, 3, VertexAttribPointerType.Float, false, 5 * sizeof(float), 0);
 
-    var texCoordLocation = _shader.GetAttribLocation("aCubeTexCoord");
+    var texCoordLocation = _shader.GetAttribLocation("aTexCoord");
     GL.EnableVertexAttribArray(texCoordLocation);
     GL.VertexAttribPointer(texCoordLocation, 2, VertexAttribPointerType.Float, false, 5 * sizeof(float), 3 * sizeof(float));
 
-    _texture = Texture.LoadFromFile("Resources/grass.png");
+    _texture = Texture.LoadFromFile($"Resources/{textureName}.png");
     _texture.Use(TextureUnit.Texture0);
-
-    _texture2 = Texture.LoadFromFile("Resources/water.png");
-    _texture2.Use(TextureUnit.Texture1);
   }
 
   public void Update() {
     _shader.Use();
+    _shader.SetInt(_textureSlot, 0);
+    _texture.Use(TextureUnit.Texture1);
 
-    _rotation += 4.0f * (float)WindowGlobalState.GetTime();
-    _shader!.SetMatrix4("view", CameraGlobalState.GetCameraEntity().GetComponent<FreeCamera>().GetViewMatrix());
-    _shader!.SetMatrix4("projection", CameraGlobalState.GetCameraEntity().GetComponent<FreeCamera>().GetProjectionMatrix());
+    GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
+  }
 
-    for(uint i=0; i<_cubePositions.Length; i++) {
-      /*
-      if(_textureSwitch) {
-        _shader.SetInt("texture0", 0);
-        _texture.Use(TextureUnit.Texture0);
-        _textureSwitch = false;
-      } else {
-        _shader.SetInt("texture1", 1);
-        _texture2.Use(TextureUnit.Texture1);
-        _textureSwitch = true;
-      }
-      */
+  public void Translate() {
+    this.SetPosition(new Vector3(_position.X + 0.01f, _position.Y, _position.Z));
+  }
 
-      // var model = Matrix4.Identity * Matrix4.CreateRotationX((float)MathHelper.DegreesToRadians(_rotation));
-      var model = Matrix4.CreateTranslation(_cubePositions[i].X, _cubePositions[i].Y, _cubePositions[i].Z);
-      
-      // model *= Matrix4.Identity * Matrix4.CreateRotationX((float)MathHelper.DegreesToRadians(_rotation));
-      model *= Matrix4.Identity * Matrix4.CreateRotationZ((float)MathHelper.DegreesToRadians(_rotation));
-      _shader!.SetMatrix4("model", model);
-      GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
-    }
+  public Vector3 GetPosition() {
+    return _position;
+  }
+
+  public void SetPosition(Vector3 position) {
+    _shader.Use();
+    _position = position;
+    var model = Matrix4.CreateTranslation(_position.X, _position.Y, _position.Z);
+    _shader!.SetMatrix4("model", model);
   }
 }

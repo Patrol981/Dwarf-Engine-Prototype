@@ -1,32 +1,57 @@
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.GraphicsLibraryFramework;
-using OpenTK.Graphics.OpenGL;
-using OpenTK.Graphics;
+using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Mathematics;
 
-using Voxelized.Globals;
-using Voxelized.Shaders;
-using Voxelized.Cameras;
-using Voxelized.Callbacks;
 
-using Voxelized.Challanges;
+using Voxelized.Globals;
+using Voxelized.GUI;
 
 namespace Voxelized.Windowing;
 
-public class Window : GameWindow {
-  private Shader? _shader;
-  private FreeCamera? _freeCam;
+public delegate void onEventCallback();
 
+public class Window : GameWindow {
   private double _time;
-  private Matrix4 _viewMatrix, _projectionMatrix;
-  private CubeTest? cubeTest;
-  private CubesTest? cubesTest;
+  private onEventCallback? _onUpdate;
+  private onEventCallback? _onRender;
+  private onEventCallback? _onDrawGUI;
+  private onEventCallback? _onResize;
+
+  private GUIController _controller;
+
   public Window(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings)
     : base(gameWindowSettings, nativeWindowSettings) {}
 
+
+  public void BindUpdateCallback(onEventCallback callback) {
+    _onUpdate = callback;
+  }
+  public void BindRenderCallback(onEventCallback callback) {
+    _onRender = callback;
+  }
+  public void BindDrawGUICallback(onEventCallback callback) {
+    _onDrawGUI = callback;
+  }
+  public void BindResizeCallback(onEventCallback callback) {
+    _onResize = callback;
+  }
+
+  public void Clear() {
+    GL.ClearColor(250.0f / 255.0f, 119.0f / 255.0f, 110.0f / 255.0f, 1.0f);
+    GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
+  }
+
+  public void Clear(Vector3 color) {
+    GL.ClearColor(color.X, color.Y, color.Z, 1.0f);
+    GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
+  }
+
   protected unsafe override void OnUpdateFrame(FrameEventArgs args) {
     base.OnUpdateFrame(args);
+
+    _onUpdate?.Invoke();
 
     GLFW.PollEvents();
   }
@@ -38,30 +63,37 @@ public class Window : GameWindow {
       return;
     }
 
+    switch(WindowGlobalState.GetCursorVisible()) {
+      case true:
+        CursorVisible = WindowGlobalState.GetCursorVisible();
+        break;
+      case false:
+        // CursorVisible = WindowGlobalState.GetCursorVisible();
+        CursorGrabbed = WindowGlobalState.GetCursorGrabbed();
+        break;
+    }
+
     WindowGlobalState.SetTime(args.Time);
     _time += 4.0f * args.Time;
 
-    GL.ClearColor(250.0f / 255.0f, 119.0f / 255.0f, 110.0f / 255.0f, 1.0f);
-    GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+    Clear();
+    //GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-    // var model = Matrix4.Identity * Matrix4.CreateRotationX((float)MathHelper.DegreesToRadians(_time));
+    _onRender?.Invoke();
 
-    // _shader!.SetMatrix4("model", model);
-    _shader!.SetMatrix4("view", _freeCam!.GetViewMatrix());
-    _shader!.SetMatrix4("projection", _freeCam!.GetProjectionMatrix());
-
-    _freeCam.HandleMovement();
-
-    // cubeTest!.Update();
-    cubesTest!.Update();
+    _controller.Update(this, (float)args.Time);
+    _onDrawGUI?.Invoke();
+    // ImGuiNET.ImGui.ShowDemoWindow();
+    _controller.Render();
 
     GLFW.SwapBuffers(this.WindowPtr);
   }
 
   protected override void OnResize(ResizeEventArgs e) {
     base.OnResize(e);
-    _freeCam!.AspectRatio = Size.X / (float)Size.Y;
+    _onResize?.Invoke();
     GL.Viewport(0, 0, WindowSettings.GetNativeWindowSettings().Size.X, WindowSettings.GetNativeWindowSettings().Size.Y);
+    _controller.WindowResized(ClientSize.X, ClientSize.Y);
   }
 
   protected override void OnLoad() {
@@ -69,34 +101,34 @@ public class Window : GameWindow {
 
     GL.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     GL.Enable(EnableCap.DepthTest);
-
-    _shader = new Shader("./Shaders/vertexShader.vert", "./Shaders/fragmentShader.frag");
-
-    _viewMatrix = Matrix4.CreateTranslation(0.0f, 0.0f, -3.0f);
-    _projectionMatrix = Matrix4.CreatePerspectiveFieldOfView
-      (MathHelper.DegreesToRadians(45.0f), this.Size.X / (float) this.Size.Y, 0.1f, 100.0f);
-
-    // cubeTest = new CubeTest(_shader);
-    cubesTest = new CubesTest(_shader);
-
-    _freeCam = new FreeCamera(Vector3.UnitZ * 3, Size.X / (float)Size.Y);
-    CameraGlobalState.SetCamera(_freeCam);
-
-    // KeyDown += new Action<KeyboardKeyEventArgs>(KeyCallback.OnPressed);
     WindowGlobalState.SetMouseState(MouseState);
     WindowGlobalState.SetKeyboardState(KeyboardState);
+    WindowGlobalState.SetCursorVisible(false);
 
-    CursorGrabbed = true;
+   // _controller = new GUIController(Size.X, Size.Y);
+   _controller = new GUIController(ClientSize.X, ClientSize.Y);
+
+    // CursorGrabbed = WindowGlobalState.GetCursorVisible();
   }
 
   protected override void OnUnload() {
     base.OnUnload();
     GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
     // GL.DeleteBuffer(_vbo);
-    _shader!.Dispose();
+    // _shader!.Dispose();
   }
 
   protected override void OnMouseMove(MouseMoveEventArgs e) {
     base.OnMouseMove(e);
+  }
+
+  protected override void OnMouseWheel(MouseWheelEventArgs e) {
+    base.OnMouseWheel(e);
+    _controller.MouseScroll(e.Offset);
+  }
+
+  protected override void OnTextInput(TextInputEventArgs e) {
+    base.OnTextInput(e);
+    _controller.PressChar((char)e.Unicode);
   }
 }

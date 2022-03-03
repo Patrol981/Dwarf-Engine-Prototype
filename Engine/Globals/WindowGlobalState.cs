@@ -11,6 +11,9 @@ public static class WindowGlobalState {
   private static double _time;
   private static MouseState? _mouseState;
   private static KeyboardState? _keyboardState;
+  private static bool _cursorVisible;
+  private static Cursor _cursor;
+  private static Vector2 _lastLockedCursorPosition = new Vector2(0,0);
 
   public static void SetTime(double time) {
     _time = time;
@@ -22,6 +25,18 @@ public static class WindowGlobalState {
 
   public static void SetKeyboardState(KeyboardState keyboardState) {
     _keyboardState = keyboardState;
+  }
+
+  public static void SetCursorVisible(bool value) {
+    _cursorVisible = value;
+  }
+
+  public static void SetCursor(Cursor cursor) {
+    _cursor = cursor;
+  }
+
+  public static void SetCursorLastLockedPosition(Vector2 position) {
+    _lastLockedCursorPosition = position;
   }
 
   public static double GetTime() {
@@ -40,5 +55,24 @@ public static class WindowGlobalState {
       return null!;
     }
     return _keyboardState;
+  }
+
+  public static bool GetCursorVisible() {
+    return _cursorVisible;
+  }
+
+  public static bool GetCursorGrabbed() {
+    if(_cursorVisible) {
+      return false;
+    }
+    return true;
+  }
+
+  public static Cursor GetCursor() {
+    return _cursor;
+  }
+
+  public static Vector2 GetCursorLastLockedPosition() {
+    return _lastLockedCursorPosition;
   }
 }

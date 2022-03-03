@@ -45,6 +45,7 @@ public class Shader {
     GL.DeleteShader(vertexShader);
     GL.DeleteShader(fragmentShader);
 
+    /*
     GL.GetProgram(_handle, GetProgramParameterName.ActiveUniforms, out var uniformsNumber);
     _uniformLocations = new Dictionary<string, int>();
 
@@ -53,6 +54,7 @@ public class Shader {
       var location = GL.GetUniformLocation(_handle, key);
       _uniformLocations.Add(key, location);
     }
+    */
   }
 
   public void Use() {
@@ -89,7 +91,8 @@ public class Shader {
   /// <param name="data">The data to set</param>
   public void SetInt(string name, int data) {
     GL.UseProgram(_handle);
-    GL.Uniform1(_uniformLocations[name], data);
+    // GL.Uniform1(_uniformLocations[name], data);
+    GL.Uniform1(GL.GetUniformLocation(_handle, name), data);
   }
 
   /// <summary>
@@ -99,7 +102,8 @@ public class Shader {
   /// <param name="data">The data to set</param>
   public void SetFloat(string name, float data) {
     GL.UseProgram(_handle);
-    GL.Uniform1(_uniformLocations[name], data);
+    // GL.Uniform1(_uniformLocations[name], data);
+    GL.Uniform1(GL.GetUniformLocation(_handle, name), data);
   }
 
   /// <summary>
@@ -114,7 +118,8 @@ public class Shader {
   /// </remarks>
   public void SetMatrix4(string name, Matrix4 data) {
     GL.UseProgram(_handle);
-    GL.UniformMatrix4(_uniformLocations[name], true, ref data);
+    // GL.UniformMatrix4(_uniformLocations[name], true, ref data);
+    GL.UniformMatrix4(GL.GetUniformLocation(_handle, name), true, ref data);
   }
 
   /// <summary>
@@ -124,7 +129,8 @@ public class Shader {
   /// <param name="data">The data to set</param>
   public void SetVector3(string name, Vector3 data) {
     GL.UseProgram(_handle);
-    GL.Uniform3(_uniformLocations[name], data);
+    GL.Uniform3(GL.GetUniformLocation(_handle, name), data);
+    // GL.Uniform3(_uniformLocations[name], data);
   }
 
   protected virtual void Dispose(bool disposing) {

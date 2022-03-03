@@ -7,14 +7,18 @@ using OpenTK.Mathematics;
 
 using Voxelized.Globals;
 using Voxelized.Enums;
+using Voxelized.ECS;
 
 namespace Voxelized.Cameras;
 
 public class FreeCamera : Camera {
   public FreeCamera(Vector3 postion, float aspectRatio) : base(postion, aspectRatio) {}
 
+  public FreeCamera() {}
+
   public void HandleMovement() {
-    var camera = CameraGlobalState.GetCamera();
+    var camera = CameraGlobalState.GetCameraEntity().GetComponent<FreeCamera>();
+    var cameraEntity = CameraGlobalState.GetCameraEntity();
     if(CameraGlobalState.GetFirstMove()) {
       CameraGlobalState.SetFirstMove(false);
       CameraGlobalState.SetLastPosition(new Vector2(WindowGlobalState.GetMouseState().Position.X, WindowGlobalState.GetMouseState().Position.Y));
@@ -27,23 +31,23 @@ public class FreeCamera : Camera {
     }
 
     if(WindowGlobalState.GetKeyboardState().IsKeyDown(Keys.W)) {
-      camera.Position += camera.Front * CameraGlobalState.GetCameraSpeed() * (float)WindowGlobalState.GetTime();
+      cameraEntity.GetComponent<Transform>().Position += camera.Front * CameraGlobalState.GetCameraSpeed() * (float)WindowGlobalState.GetTime();
     }
     if(WindowGlobalState.GetKeyboardState().IsKeyDown(Keys.S)) {
-      camera.Position -= camera.Front * CameraGlobalState.GetCameraSpeed() * (float)WindowGlobalState.GetTime();
+      cameraEntity.GetComponent<Transform>().Position -= camera.Front * CameraGlobalState.GetCameraSpeed() * (float)WindowGlobalState.GetTime();
     }
     if(WindowGlobalState.GetKeyboardState().IsKeyDown(Keys.A)) {
-      camera.Position -= camera.Right * CameraGlobalState.GetCameraSpeed() * (float)WindowGlobalState.GetTime();
+      cameraEntity.GetComponent<Transform>().Position -= camera.Right * CameraGlobalState.GetCameraSpeed() * (float)WindowGlobalState.GetTime();
     }
     if(WindowGlobalState.GetKeyboardState().IsKeyDown(Keys.D)) {
-      camera.Position += camera.Right * CameraGlobalState.GetCameraSpeed() * (float)WindowGlobalState.GetTime();
+      cameraEntity.GetComponent<Transform>().Position += camera.Right * CameraGlobalState.GetCameraSpeed() * (float)WindowGlobalState.GetTime();
     }
 
     if(WindowGlobalState.GetKeyboardState().IsKeyDown(Keys.LeftShift)) {
-      camera.Position += camera._up * CameraGlobalState.GetCameraSpeed() * (float)WindowGlobalState.GetTime();
+      cameraEntity.GetComponent<Transform>().Position += camera.WorldUp * CameraGlobalState.GetCameraSpeed() * (float)WindowGlobalState.GetTime();
     }
     if(WindowGlobalState.GetKeyboardState().IsKeyDown(Keys.Space)) {
-      camera.Position -= camera._up * CameraGlobalState.GetCameraSpeed() * (float)WindowGlobalState.GetTime();
+      cameraEntity.GetComponent<Transform>().Position -= camera.WorldUp * CameraGlobalState.GetCameraSpeed() * (float)WindowGlobalState.GetTime();
     }
 
     if(WindowGlobalState.GetKeyboardState().IsKeyPressed(Keys.Tab)) {
@@ -59,9 +63,24 @@ public class FreeCamera : Camera {
           break;
       }
     }
+
+    if(WindowGlobalState.GetKeyboardState().IsKeyPressed(Keys.F)) {
+      var currentCursorState = WindowGlobalState.GetCursorVisible();
+      switch(currentCursorState) {
+        case true:
+          WindowGlobalState.SetCursorVisible(false);
+          break;
+        case false:
+          WindowGlobalState.SetCursorVisible(true);
+          break;
+      }
+    }
   }
 
   internal override void UpdateVectors() {
+    if(WindowGlobalState.GetCursorVisible()) {
+      return;
+    }
     // First, the front matrix is calculated using some basic trigonometry.
     _front.X = MathF.Cos(_pitch) * MathF.Cos(_yaw);
     _front.Y = MathF.Sin(_pitch);

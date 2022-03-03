@@ -2,11 +2,14 @@ using OpenTK.Mathematics;
 
 using Voxelized.Cameras;
 using Voxelized.Enums;
+using Voxelized.ECS;
+using Voxelized.DataStructures;
 
 namespace Voxelized.Globals;
 
 public static class CameraGlobalState {
   private static Camera? _camera;
+  private static Entity? _cameraEntity;
   private static float _cameraSpeed = 1.5f;
   private static float _sensitivity = 0.2f;
   private static bool _firstMove = true;
@@ -15,6 +18,10 @@ public static class CameraGlobalState {
 
   public static void SetCamera(Camera camera) {
     _camera = camera;
+  }
+
+  public static void SetCameraEntity(Entity cameraEntity) {
+    _cameraEntity = cameraEntity;
   }
 
   public static void SetCameraSpeed(float cameraSpeed) {
@@ -42,6 +49,13 @@ public static class CameraGlobalState {
       _camera = new FreeCamera(Vector3.Zero, float.NaN);
     }
     return _camera;
+  }
+
+  public static Entity GetCameraEntity() {
+    if(_cameraEntity == null) {
+      _cameraEntity = new Entity();
+    }
+    return _cameraEntity;
   }
 
   public static float GetCameraSpeed() {

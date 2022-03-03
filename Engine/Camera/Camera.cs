@@ -1,14 +1,16 @@
 using OpenTK.Mathematics;
 using System;
 
+using Voxelized.ECS;
+
 namespace Voxelized.Cameras;
-public abstract class Camera {
+ public abstract class Camera : Component {
   // Those vectors are directions pointing outwards from the camera to define how it rotated.
-  internal Vector3 _front = -Vector3.UnitZ;
+  protected Vector3 _front = -Vector3.UnitZ;
 
-  internal Vector3 _up = Vector3.UnitY;
+  protected Vector3 _up = Vector3.UnitY;
 
-  internal Vector3 _right = Vector3.UnitX;
+  protected Vector3 _right = Vector3.UnitX;
 
   internal float _pitch;
 
@@ -20,14 +22,17 @@ public abstract class Camera {
   public float AspectRatio { internal get; set; }
 
   public Vector3 Front => _front;
-
   public Vector3 Up => _up;
-
   public Vector3 Right => _right;
+  public Vector3 WorldUp = new Vector3(0f, 1f, 0f);
 
   public Camera(Vector3 position, float aspectRatio) {
-    Position = position;
+    // Position = position;
     AspectRatio = aspectRatio;
+  }
+
+  public Camera() {
+
   }
 
   public float Pitch {
@@ -55,7 +60,8 @@ public abstract class Camera {
   }
 
   public Matrix4 GetViewMatrix() {
-    return Matrix4.LookAt(Position, Position + _front, _up);
+    Vector3 position = Owner!.GetComponent<Transform>().Position;
+    return Matrix4.LookAt(position, position + _front, _up);
   }
 
   public Matrix4 GetProjectionMatrix() {
