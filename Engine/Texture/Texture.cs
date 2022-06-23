@@ -50,6 +50,10 @@ public class Texture {
     GL.BindTexture(TextureTarget.Texture2D, _handle);
   }
 
+  public int GetHandle() {
+    return _handle;
+  }
+
   public void OldLoad(string path) {
     Image<Rgba32> image = Image.Load<Rgba32>(path);
 

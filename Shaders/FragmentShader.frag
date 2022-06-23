@@ -4,9 +4,11 @@ out vec4 vFragColor;
 
 in vec3 vFragPos;
 in vec3 vNormal;
+in vec2 TexCoord;
 
 uniform vec3 uViewPos;
 uniform vec3 uDiffuse;
+uniform sampler2D myTexture;
 
 void main()
 {
@@ -15,5 +17,6 @@ void main()
 
     float cc = max(abs(dot(viewDir,norm)), 0.3f);
     vec3 res = vec3(cc*uDiffuse);
-    vFragColor = vec4(res, 1.0);
+    // vFragColor = vec4(res, 1.0);
+    vFragColor = texture(myTexture, TexCoord) * vec4(res, 1.0);
 }

@@ -1,6 +1,7 @@
 using OpenTK.Mathematics;
 
 using Voxelized.ECS;
+using Voxelized.DataStructures;
 
 namespace Voxelized.Loaders;
 
@@ -13,7 +14,6 @@ public class STLMeshLoader : MeshLoader {
 
     byte[] tmp = new byte[4];
 
-    /* 80 bytes title + 4 byte num of triangles + 50 bytes (1 of triangular mesh)  */
     if(fileBytes.Length > 120) {
       tmp[0] = fileBytes[80];
       tmp[1] = fileBytes[81];
@@ -43,7 +43,8 @@ public class STLMeshLoader : MeshLoader {
       }
     }
 
-    Mesh mesh = new Mesh(meshes.ToArray(), triangles * 3);
+    // Mesh mesh = new Mesh(meshes.ToArray(), triangles * 3);
+    Mesh mesh = new();
     return mesh;
   }
 

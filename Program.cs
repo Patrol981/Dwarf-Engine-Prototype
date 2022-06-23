@@ -18,7 +18,7 @@ class Program {
     }
     */
 
-    var engine = new Engine();
+    var engine = new EngineClass();
     engine.Run();
 
     GLFW.Terminate();
