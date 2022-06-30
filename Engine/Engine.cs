@@ -7,6 +7,7 @@ using Voxelized.ECS;
 using Voxelized.Globals;
 using Voxelized.Info;
 using Voxelized.Scenes;
+using Voxelized.Engine.Skybox;
 
 using Voxelized.Engine.Generators;
 
@@ -16,8 +17,7 @@ public class EngineClass {
   private Voxelized.Windowing.Window _window;
   private Scene _scene;
   private FPS _fps;
-
-  private Entity terrain;
+  private Skybox _skybox;
 
   public EngineClass() {
     _window = new Voxelized.Windowing.Window(GameWindowSettings.Default, WindowSettings.GetNativeWindowSettings());
@@ -32,18 +32,11 @@ public class EngineClass {
     camera.AddComponent(new FreeCamera(Vector3.UnitZ * 3, _window.Size.X / (float)_window.Size.Y));
     CameraGlobalState.SetCameraEntity(camera);
 
-    terrain = new Entity();
-    terrain.AddComponent(new Transform(new Vector3(0, 0, 0)));
-    terrain.AddComponent(new Material(new Vector3(1f, 1f, 0.0f)));
-    terrain.AddComponent(new MeshGenerator());
-    terrain.GetComponent<MeshGenerator>().SetupPlane(5, 5);
-    terrain.SetName("new terrain");
-    //terrain.AddComponent(new MeshRenderer());
-    //terrain.GetComponent<MeshRenderer>().Init();
-
     _scene = new DebugScene();
 
     _fps = new FPS();
+
+    _skybox = new Skybox(_window.Size.X / (float)_window.Size.Y);
 
   }
 
@@ -58,13 +51,12 @@ public class EngineClass {
   public void OnRender() {
     var camera = CameraGlobalState.GetCameraEntity().GetComponent<FreeCamera>();
     camera.HandleMovement();
+
+    _skybox.Update(camera);
     // MouseSelect();
     for (int i = 0; i < _scene.Entities.Count; i++) {
       _scene.Entities[i].GetComponent<MeshRenderer>().Render(camera);
     }
-
-    // terrain.GetComponent<MeshRenderer>().Render(camera);
-    terrain.GetComponent<MeshGenerator>().Render(camera);
   }
 
   public void OnResize() {
@@ -78,17 +70,6 @@ public class EngineClass {
 
       if (ImGui.BeginMenu("Debug Data")) {
         var entities = EntityGlobalState.GetEntities();
-        if(ImGui.TreeNodeEx(terrain.GetName())) {
-          ImGui.Text($"Terrain name: {terrain.GetName()}");
-          var color = terrain.GetComponent<Material>().GetColor();
-          var pos = terrain.GetComponent<Transform>();
-          var cnvVec = new System.Numerics.Vector3(color.X, color.Y, color.Z);
-          var cnvPos = new System.Numerics.Vector3(pos.Position.X, pos.Position.Y, pos.Position.Z);
-          ImGui.DragFloat3("Material Color", ref cnvVec, 0.01f);
-          terrain.GetComponent<Material>().SetColor(new Vector3(cnvVec.X, cnvVec.Y, cnvVec.Z));
-          ImGui.DragFloat3("Position", ref cnvPos, 0.01f);
-          terrain.GetComponent<Transform>().Position = new Vector3(cnvPos.X, cnvPos.Y, cnvPos.Z);
-        }
         for (int i = 0; i < entities.Count; i++) {
           ImGui.PushID(entities[i].GetName());
           if (ImGui.TreeNodeEx(entities[i].GetName())) {

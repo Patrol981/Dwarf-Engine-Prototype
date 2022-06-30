@@ -7,6 +7,7 @@ using OpenTK.Mathematics;
 
 using Voxelized.Globals;
 using Voxelized.GUI;
+using Voxelized.Engine.Skybox;
 
 namespace Voxelized.Windowing;
 
