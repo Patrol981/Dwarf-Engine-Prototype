@@ -7,6 +7,7 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using Voxelized.Cameras;
+using Voxelized.ECS;
 using Voxelized.Globals;
 using Voxelized.Shaders;
 
@@ -77,12 +78,14 @@ public class Skybox {
     _ratio = ratio;
 
     List<string> faces = new List<string>();
-    faces.Add("./Resources/Skyboxes/Sunny/right.jpg");
     faces.Add("./Resources/Skyboxes/Sunny/left.jpg");
-    faces.Add("./Resources/Skyboxes/Sunny/top.jpg");
     faces.Add("./Resources/Skyboxes/Sunny/bottom.jpg");
-    faces.Add("./Resources/Skyboxes/Sunny/front.jpg");
+    
     faces.Add("./Resources/Skyboxes/Sunny/back.jpg");
+    faces.Add("./Resources/Skyboxes/Sunny/right.jpg");
+
+    faces.Add("./Resources/Skyboxes/Sunny/top.jpg");
+    faces.Add("./Resources/Skyboxes/Sunny/front.jpg");
 
     _vao = GL.GenVertexArray();
     _vbo = GL.GenBuffer();
@@ -113,10 +116,12 @@ public class Skybox {
     GL.DepthFunc(DepthFunction.Lequal);
     _shader!.Use();
     var ogView = camera.GetViewMatrix();
-    Matrix4.CreateTranslation(0, 0, 0, out var newMat);
-    // Matrix4.CreatePerspectiveFieldOfView(45.0f, _ratio, 0.1f, 100.0f);
-    var projection = Matrix4.Transpose(camera.GetProjectionMatrix());
-    _shader!.SetMatrix4("view", ogView);
+    var rotY = Matrix4.CreateRotationY(camera.Yaw / camera.Fov * (-1));
+    var rotX = Matrix4.CreateRotationX(camera.Pitch / camera.Fov);
+    var view = ogView.ClearRotation() * rotX * rotY;
+    var ogProj = camera.GetProjectionMatrix();
+    var projection = Matrix4.Transpose(ogProj);
+    _shader!.SetMatrix4("view", view);
     _shader!.SetMatrix4("projection", projection);
 
     GL.BindVertexArray(_vao);
@@ -134,7 +139,7 @@ public class Skybox {
 
     for (int i = 0; i < faces.Count; i++) {
       Image<Rgba32> image = Image.Load<Rgba32>(faces[i]);
-      image.Mutate(x => x.Flip(FlipMode.Vertical));
+      // image.Mutate(x => x.Flip(FlipMode.Vertical));
 
       var pixels = new List<byte>(4 * image.Width * image.Height);
 

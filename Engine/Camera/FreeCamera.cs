@@ -26,8 +26,12 @@ public class FreeCamera : Camera {
       var deltaX = WindowGlobalState.GetMouseState().Position.X - CameraGlobalState.GetLastPosition().X;
       var deltaY = WindowGlobalState.GetMouseState().Position.Y - CameraGlobalState.GetLastPosition().Y;
       CameraGlobalState.SetLastPosition(new Vector2(WindowGlobalState.GetMouseState().Position.X, WindowGlobalState.GetMouseState().Position.Y));
-      camera.Yaw += deltaX * CameraGlobalState.GetSensitivity();
-      camera.Pitch -= deltaY * CameraGlobalState.GetSensitivity();
+      
+      if(!WindowGlobalState.GetCursorVisible()) {
+        camera.Yaw += deltaX * CameraGlobalState.GetSensitivity();
+        camera.Pitch -= deltaY * CameraGlobalState.GetSensitivity();
+      }
+      
     }
 
     if(WindowGlobalState.GetKeyboardState().IsKeyDown(Keys.W)) {
