@@ -1,9 +1,9 @@
 using OpenTK.Mathematics;
 using System;
 
-using Voxelized.ECS;
+using Voxelized.Engine.ECS;
 
-namespace Voxelized.Cameras;
+namespace Voxelized.Engine.Cameras;
  public abstract class Camera : Component {
   // Those vectors are directions pointing outwards from the camera to define how it rotated.
   protected Vector3 _front = -Vector3.UnitZ;

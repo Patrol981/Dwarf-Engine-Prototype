@@ -1,6 +1,6 @@
-using Voxelized.DataStructures;
+using Voxelized.Engine.DataStructures;
 
-namespace Voxelized.ECS;
+namespace Voxelized.Engine.ECS;
 
 public abstract class Component {
   public Entity? Owner = null;

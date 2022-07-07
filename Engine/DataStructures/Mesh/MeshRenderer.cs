@@ -2,11 +2,11 @@ using OpenTK;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 
-using Voxelized.Shaders;
-using Voxelized.Cameras;
-using Voxelized.ECS;
+using Voxelized.Engine.Shaders;
+using Voxelized.Engine.Cameras;
+using Voxelized.Engine.ECS;
 
-namespace Voxelized.DataStructures;
+namespace Voxelized.Engine.DataStructures;
 
 class MeshRenderer : Component {
 
@@ -35,7 +35,7 @@ class MeshRenderer : Component {
     GL.BufferData(
       BufferTarget.ArrayBuffer,
       mesh.BufferDataCount,
-      mesh.GetVertexArray().ToArray(),
+      mesh.VertexArray.ToArray(),
       BufferUsageHint.StaticDraw
     );
 
@@ -65,23 +65,13 @@ class MeshRenderer : Component {
 
     if(mesh.MeshRenderType == Engine.Enums.MeshRenderType.WavefrontObjFile) {
       //GL.EnableVertexAttribArray(2);
-      //GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, mesh.PackageStrideSize, 6 * sizeof(float));
+      GL.VertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, mesh.PackageStrideSize, 6 * sizeof(float));
+
+      var texCoordLocation = _shader.GetAttribLocation("aTexCoord");
+      GL.EnableVertexAttribArray(texCoordLocation);
+
+      _shader.SetInt("texture0", 0);
     }
-
-    // texture
-    //var texCoordLocation = _shader.GetAttribLocation("aTexCoord");
-    //GL.EnableVertexAttribArray(texCoordLocation);
-
-    //mesh.Texture = Textures.Texture.LoadFromFile("Resources/container.png");
-    //mesh.Texture.Use(TextureUnit.Texture0);
-
-    //_shader.SetInt("texture0", 0);
-
-    // GL.BindBuffer(BufferTarget.ArrayBuffer, _vbo);
-
-    //if (mesh.ColorPerIndex.Count > 0) {
-
-    //}
 
     GL.BindVertexArray(0);
 
@@ -107,6 +97,15 @@ class MeshRenderer : Component {
     _shader.SetMatrix4("uView", view);
 
     Matrix4 worldModel = _model * Matrix4.CreateTranslation(Owner.GetComponent<Transform>().Position);
+    var qY = Quaternion.FromAxisAngle(Owner.GetComponent<Transform>().Position, Owner.GetComponent<Transform>().Rotation.Y);
+    
+
+    // var t = Matrix4.CreateTranslation(camera.Owner!.GetComponent<Transform>().Position);
+    var rotY = Matrix4.CreateRotationY(MathHelper.DegreesToRadians(Owner.GetComponent<Transform>().Rotation.Y));
+    //worldModel *= Matrix4.Identity * Matrix4.CreateRotationX((float)MathHelper.DegreesToRadians(Owner.GetComponent<Transform>().Rotation.X));
+    //worldModel *= Matrix4.Transpose(Matrix4.CreateRotationY((float)MathHelper.DegreesToRadians(Owner.GetComponent<Transform>().Rotation.Y)));
+    //worldModel *= Matrix4.Identity * Matrix4.CreateRotationZ((float)MathHelper.DegreesToRadians(Owner.GetComponent<Transform>().Rotation.Z));
+    worldModel *= (rotY * Matrix4.CreateTranslation(5,0,0));
     _shader.SetMatrix4("uModel", worldModel);
 
     GL.BindVertexArray(_vao);

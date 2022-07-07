@@ -1,17 +1,17 @@
 using OpenTK.Mathematics;
 
-using Voxelized.ECS;
+using Voxelized.Engine.ECS;
 using Voxelized.Engine.Enums;
 
-namespace Voxelized.DataStructures;
+namespace Voxelized.Engine.DataStructures;
 
 public class Mesh : Component {
-  private List<Vector3> _vertexArray;
+  private List<float> _vertexArray;
   private List<Vector3> _normals;
   private List<Vector3> _vertices;
   private List<int> _indices;
 
-  private Voxelized.Textures.Texture _texture;
+  private Voxelized.Engine.Textures.Texture _texture;
 
   private int _bufferDataCount;
   private int _packageStrideSize;
@@ -23,8 +23,9 @@ public class Mesh : Component {
     MeshRenderType meshRenderType,
     List<Vector3> vertices,
     List<Vector3> normals,
-    List<Vector3> vertexArray,
-    List<int> indices = null!
+    List<float> vertexArray,
+    List<int> indices = null!,
+    Textures.Texture texture = null!
   ) {
     _vertices = vertices;
     _normals = normals;
@@ -32,6 +33,8 @@ public class Mesh : Component {
     _indices = indices;
 
     _meshRenderType = meshRenderType;
+
+    _texture = texture;
 
     CalculateVertexArray(meshRenderType);
   }
@@ -50,10 +53,6 @@ public class Mesh : Component {
 
     switch (meshRenderType) {
       case MeshRenderType.Standard: {
-          for (int i = 0; i < _indices.Count; i++) {
-
-          }
-
           _bufferDataCount = _vertexArray.Count * sizeof(float);
           _packageStrideSize = 6 * sizeof(float);
           _drawCount = _vertexArray.Count;
@@ -61,14 +60,14 @@ public class Mesh : Component {
         }
 
       case MeshRenderType.WavefrontObjFile: {
-          _bufferDataCount = _vertexArray.Count * sizeof(float) * 3;
-          _packageStrideSize = 6 * sizeof(float);
+          _bufferDataCount = _vertexArray.Count * sizeof(float);
+          _packageStrideSize = 8 * sizeof(float);
           _drawCount = _vertexArray.Count;
           break;
         }
 
       case MeshRenderType.Terrain: {
-          _bufferDataCount = _vertexArray.Count * sizeof(float) * 3;
+          _bufferDataCount = _vertexArray.Count * sizeof(float);
           _packageStrideSize = 6 * sizeof(float);
           _drawCount = _vertexArray.Count;
           break;
@@ -76,12 +75,12 @@ public class Mesh : Component {
     }
   }
 
-  public List<Vector3> GetVertexArray() {
+  public List<float> GetVertexArray() {
     // var list = CalculateVertexArray(_meshRenderType);
     return _vertexArray;
   }
 
-  public List<Vector3> VertexArray {
+  public List<float> VertexArray {
     get { return _vertexArray; }
     set { _vertexArray = value; }
   }
@@ -118,7 +117,7 @@ public class Mesh : Component {
     set { _indices = value; }
   }
 
-  public Voxelized.Textures.Texture Texture {
+  public Textures.Texture Texture {
     get { return _texture; }
     set { _texture = value; }
   }

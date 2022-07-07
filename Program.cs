@@ -3,10 +3,10 @@ using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
-using Voxelized.Windowing;
-using Voxelized.Globals;
+using Voxelized.Engine.Windowing;
+using Voxelized.Engine.Globals;
 using Voxelized.Callbacks;
-using Voxelized;
+using Voxelized.Engine;
 
 class Program {
   unsafe static void Main() {

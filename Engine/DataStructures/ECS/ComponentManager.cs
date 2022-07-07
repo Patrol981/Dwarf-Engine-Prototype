@@ -1,4 +1,4 @@
-namespace Voxelized.ECS;
+namespace Voxelized.Engine.ECS;
 
 public class ComponentManager {
   private Dictionary<Type, Component> _components;

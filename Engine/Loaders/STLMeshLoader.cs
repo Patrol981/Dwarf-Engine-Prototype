@@ -1,9 +1,9 @@
 using OpenTK.Mathematics;
 
-using Voxelized.ECS;
-using Voxelized.DataStructures;
+using Voxelized.Engine.ECS;
+using Voxelized.Engine.DataStructures;
 
-namespace Voxelized.Loaders;
+namespace Voxelized.Engine.Loaders;
 
 public class STLMeshLoader : MeshLoader {
   public override Mesh Load(string path) {

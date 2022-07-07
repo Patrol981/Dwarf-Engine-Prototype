@@ -1,36 +1,30 @@
 using ImGuiNET;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Desktop;
-using Voxelized.Cameras;
-using Voxelized.DataStructures;
-using Voxelized.ECS;
-using Voxelized.Globals;
-using Voxelized.Info;
-using Voxelized.Scenes;
-using Voxelized.Engine.Skybox;
+using Voxelized.Engine.Cameras;
+using Voxelized.Engine.DataStructures;
+using Voxelized.Engine.ECS;
+using Voxelized.Engine.Globals;
+using Voxelized.Engine.Info;
+using Voxelized.Engine.Skyboxes;
+using Voxelized.Engine.Scenes;
 
-using Voxelized.Engine.Generators;
-
-namespace Voxelized;
+namespace Voxelized.Engine;
 
 public class EngineClass {
-  private Voxelized.Windowing.Window _window;
+  private Windowing.Window _window;
   private Scene _scene;
   private FPS _fps;
   private Skybox _skybox;
 
   public EngineClass() {
-    _window = new Voxelized.Windowing.Window(GameWindowSettings.Default, WindowSettings.GetNativeWindowSettings());
+    _window = new Voxelized.Engine.Windowing.Window(GameWindowSettings.Default, WindowSettings.GetNativeWindowSettings());
+    WindowGlobalState.SetWindow(_window);
 
     _window.BindUpdateCallback(OnUpdate);
     _window.BindRenderCallback(OnRender);
     _window.BindResizeCallback(OnResize);
     _window.BindDrawGUICallback(OnDrawGUI);
-
-    var camera = new Entity();
-    camera.AddComponent(new Transform(new Vector3(0, 0, 1)));
-    camera.AddComponent(new FreeCamera(Vector3.UnitZ * 3, _window.Size.X / (float)_window.Size.Y));
-    CameraGlobalState.SetCameraEntity(camera);
 
     _scene = new DebugScene();
 
@@ -49,18 +43,19 @@ public class EngineClass {
   }
 
   public void OnRender() {
-    var camera = CameraGlobalState.GetCameraEntity().GetComponent<FreeCamera>();
+    // var camera = CameraGlobalState.GetCameraEntity().GetComponent<FreeCamera>();
+    var camera = (ICamera)CameraGlobalState.GetCamera();
     camera.HandleMovement();
 
-    _skybox.Update(camera);
+    _skybox.Update((Camera)camera);
     // MouseSelect();
     for (int i = 0; i < _scene.Entities.Count; i++) {
-      _scene.Entities[i].GetComponent<MeshRenderer>().Render(camera);
+      _scene.Entities[i].GetComponent<MeshRenderer>().Render((Camera)camera);
     }
   }
 
   public void OnResize() {
-    CameraGlobalState.GetCameraEntity().GetComponent<FreeCamera>().AspectRatio =
+    CameraGlobalState.GetCamera().AspectRatio =
       _window.Size.X / (float)_window.Size.Y;
   }
 
@@ -83,7 +78,7 @@ public class EngineClass {
             entities[i].GetComponent<Material>().SetColor(new Vector3(cnvVec.X, cnvVec.Y, cnvVec.Z));
             ImGui.DragFloat3("Position", ref cnvPos, 0.01f);
             entities[i].GetComponent<Transform>().Position = new Vector3(cnvPos.X, cnvPos.Y, cnvPos.Z);
-            ImGui.DragFloat3("Rotation", ref cnvPos, 0.01f);
+            ImGui.DragFloat3("Rotation", ref cnvRot, 0.01f);
             entities[i].GetComponent<Transform>().Rotation = new Vector3(cnvRot.X, cnvRot.Y, cnvRot.Z);
           }
         }

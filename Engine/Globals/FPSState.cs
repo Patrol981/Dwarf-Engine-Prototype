@@ -1,4 +1,4 @@
-namespace Voxelized.Globals;
+namespace Voxelized.Engine.Globals;
 
 public static class FPSState {
   private static double _frames = 0;

@@ -1,9 +1,9 @@
 ﻿using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
-using Voxelized.Cameras;
-using Voxelized.DataStructures;
-using Voxelized.ECS;
-using Voxelized.Shaders;
+using Voxelized.Engine.Cameras;
+using Voxelized.Engine.DataStructures;
+using Voxelized.Engine.ECS;
+using Voxelized.Engine.Shaders;
 
 namespace Voxelized.Engine.Generators;
 internal class MeshGenerator : Component {
@@ -24,7 +24,7 @@ internal class MeshGenerator : Component {
   List<float> _vertices = new();
   List<float> _normals = new();
   List<int> _indices = new();
-  List<Vector3> _vertexArray = new();
+  List<float> _vertexArray = new();
   int _count;
 
   public MeshGenerator() {
@@ -107,9 +107,8 @@ internal class MeshGenerator : Component {
     }
 
     for (int i = 0; i < _vertices.Count; i += 3) {
-     _vertexArray.Add(new Vector3(vertices[i], vertices[i + 1], vertices[i + 2]));
-     _vertexArray.Add(new Vector3(normals[i], normals[i + 1], normals[i + 2]));
-      /*
+     //_vertexArray.AddRange(new float[] { vertices[i], vertices[i + 1], vertices[i + 2] });
+     //_vertexArray.AddRange(new float[] { normals[i], normals[i + 1], normals[i + 2] });
       _vertexArray.AddRange(
           new float[] {
             vertices[i],
@@ -120,19 +119,8 @@ internal class MeshGenerator : Component {
             normals[i + 2]
           }
       );
-      */
       
     }
-
-    for (int x = 0; x < count; x++) {
-      //vec3 position,vec3 normals, vec3 color
-      //array.Add(verts[x]);
-      //array.Add(norms[x]);
-      // array.Add(colors[x]);
-    }
-    //for (int x = 0; x < indices.Length; x++) {
-    //Console.WriteLine(vertices[x]);
-    //}
 
     mesh.Vertices = verts.ToList();
     mesh.Normals = norms;
@@ -141,48 +129,7 @@ internal class MeshGenerator : Component {
     mesh.MeshRenderType = Enums.MeshRenderType.Terrain;
 
     mesh.CalculateVertexArray(mesh.MeshRenderType);
-    // mesh.VertexArray = array;
-    /*
-    _vao = GL.GenVertexArray();
-    GL.BindVertexArray(_vao);
 
-    _vbo = GL.GenBuffer();
-    GL.BindBuffer(BufferTarget.ArrayBuffer, _vbo);
-
-    _ebo = GL.GenBuffer();
-    GL.BindBuffer(BufferTarget.ElementArrayBuffer, _ebo);
-
-    GL.BufferData(
-      BufferTarget.ArrayBuffer,
-      mesh.VertexArray.Count * sizeof(float) * 3,
-      mesh.VertexArray.ToArray(),
-      BufferUsageHint.StaticDraw
-    );
-
-    GL.BufferData(
-      BufferTarget.ElementArrayBuffer,
-      mesh.Indices.Count * sizeof(int),
-      mesh.Indices.ToArray(),
-      BufferUsageHint.StaticDraw
-    );
-
-
-    // pos
-    GL.EnableVertexAttribArray(0);
-    // GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 0);
-    GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, mesh.PackageStrideSize, 0);
-
-    int t1 = mesh.PackageStrideSize;
-    int t2 = 6 * sizeof(float);
-    // normal
-    GL.EnableVertexAttribArray(1);
-    GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 3 * sizeof(float));
-
-
-    //GL.EnableVertexAttribArray(2);
-    //GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 0);
-    GL.BindVertexArray(0);
-    */
     return mesh;
 
   }

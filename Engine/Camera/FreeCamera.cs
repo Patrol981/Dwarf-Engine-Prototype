@@ -5,13 +5,13 @@ using OpenTK.Graphics;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Mathematics;
 
-using Voxelized.Globals;
-using Voxelized.Enums;
-using Voxelized.ECS;
+using Voxelized.Engine.Globals;
+using Voxelized.Engine.Enums;
+using Voxelized.Engine.ECS;
 
-namespace Voxelized.Cameras;
+namespace Voxelized.Engine.Cameras;
 
-public class FreeCamera : Camera {
+public class FreeCamera : Camera, ICamera {
   public FreeCamera(Vector3 postion, float aspectRatio) : base(postion, aspectRatio) {}
 
   public FreeCamera() {}
@@ -98,5 +98,13 @@ public class FreeCamera : Camera {
     // not be what you need for all cameras so keep this in mind if you do not want a FPS camera.
     _right = Vector3.Normalize(Vector3.Cross(_front, Vector3.UnitY));
     _up = Vector3.Normalize(Vector3.Cross(_right, _front));
+  }
+
+  public float GetAspectRatio() {
+    return AspectRatio;
+  }
+
+  public void SetAspectRatio(float aspectRatio) {
+    AspectRatio = aspectRatio;
   }
 }

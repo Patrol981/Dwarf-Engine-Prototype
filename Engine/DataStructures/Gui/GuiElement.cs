@@ -1,4 +1,4 @@
-namespace Voxelized.DataStructures;
+namespace Voxelized.Engine.DataStructures;
 
 public abstract class GuiElement {
   private string _name;

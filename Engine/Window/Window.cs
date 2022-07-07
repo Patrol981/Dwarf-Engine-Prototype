@@ -5,11 +5,10 @@ using OpenTK.Windowing.Desktop;
 using OpenTK.Mathematics;
 
 
-using Voxelized.Globals;
-using Voxelized.GUI;
-using Voxelized.Engine.Skybox;
+using Voxelized.Engine.Globals;
+using Voxelized.Engine.GUI;
 
-namespace Voxelized.Windowing;
+namespace Voxelized.Engine.Windowing;
 
 public delegate void onEventCallback();
 

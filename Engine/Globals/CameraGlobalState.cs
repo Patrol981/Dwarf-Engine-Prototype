@@ -1,11 +1,11 @@
 using OpenTK.Mathematics;
 
-using Voxelized.Cameras;
-using Voxelized.Enums;
-using Voxelized.ECS;
-using Voxelized.DataStructures;
+using Voxelized.Engine.Cameras;
+using Voxelized.Engine.Enums;
+using Voxelized.Engine.ECS;
+using Voxelized.Engine.DataStructures;
 
-namespace Voxelized.Globals;
+namespace Voxelized.Engine.Globals;
 
 public static class CameraGlobalState {
   private static Camera? _camera;

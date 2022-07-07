@@ -5,7 +5,7 @@ using OpenTK.Graphics;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Mathematics;
 
-namespace Voxelized.Globals;
+namespace Voxelized.Engine.Globals;
 
 public static class WindowGlobalState {
   private static double _time;
@@ -14,6 +14,11 @@ public static class WindowGlobalState {
   private static bool _cursorVisible;
   private static Cursor _cursor;
   private static Vector2 _lastLockedCursorPosition = new Vector2(0,0);
+  private static Windowing.Window? _window;
+
+  public static void SetWindow(Windowing.Window window) {
+    _window = window;
+  }
 
   public static void SetTime(double time) {
     _time = time;
@@ -37,6 +42,10 @@ public static class WindowGlobalState {
 
   public static void SetCursorLastLockedPosition(Vector2 position) {
     _lastLockedCursorPosition = position;
+  }
+
+  public static Windowing.Window GetWindow() {
+    return _window;
   }
 
   public static double GetTime() {

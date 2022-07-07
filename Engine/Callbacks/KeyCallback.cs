@@ -3,7 +3,7 @@ using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
-using Voxelized.Globals;
+using Voxelized.Engine.Globals;
 
 namespace Voxelized.Callbacks;
 

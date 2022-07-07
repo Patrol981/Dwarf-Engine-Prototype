@@ -1,4 +1,4 @@
-namespace Voxelized.Enums;
+namespace Voxelized.Engine.Enums;
 
 public enum WindowRenderMode {
   Normal,

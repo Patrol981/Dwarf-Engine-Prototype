@@ -1,6 +1,6 @@
-using Voxelized.ECS;
+using Voxelized.Engine.ECS;
 
-namespace Voxelized.DataStructures;
+namespace Voxelized.Engine.DataStructures;
 
 public class Entity {
   private ComponentManager _componentManager;

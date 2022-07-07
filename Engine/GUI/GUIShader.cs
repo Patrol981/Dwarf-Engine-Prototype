@@ -9,7 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using OpenTK.Graphics.OpenGL4;
 
-namespace Voxelized.GUI;
+namespace Voxelized.Engine.GUI;
 
 public struct UniformFieldInfo {
   public int Location;

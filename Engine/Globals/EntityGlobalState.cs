@@ -1,7 +1,7 @@
-using Voxelized.ECS;
-using Voxelized.DataStructures;
+using Voxelized.Engine.ECS;
+using Voxelized.Engine.DataStructures;
 
-namespace Voxelized.Globals;
+namespace Voxelized.Engine.Globals;
 public static class EntityGlobalState {
   private static List<Entity>? _entities;
 

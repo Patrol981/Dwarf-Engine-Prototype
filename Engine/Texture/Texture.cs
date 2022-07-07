@@ -6,7 +6,7 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 
-namespace Voxelized.Textures;
+namespace Voxelized.Engine.Textures;
 
 public class Texture {
   private readonly int _handle;

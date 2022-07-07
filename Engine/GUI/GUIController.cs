@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
-namespace Voxelized.GUI;
+namespace Voxelized.Engine.GUI;
 public class GUIController : IDisposable {
   private bool _frameBegun;
 

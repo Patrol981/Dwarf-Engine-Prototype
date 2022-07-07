@@ -1,6 +1,6 @@
 using OpenTK.Mathematics;
 
-namespace Voxelized.DataStructures;
+namespace Voxelized.Engine.DataStructures;
 
 public struct Vertex {
   public Vector3 Position;

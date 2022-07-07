@@ -6,12 +6,12 @@ using OpenTK.Mathematics;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
-using Voxelized.Cameras;
-using Voxelized.ECS;
-using Voxelized.Globals;
-using Voxelized.Shaders;
+using Voxelized.Engine.Cameras;
+using Voxelized.Engine.ECS;
+using Voxelized.Engine.Globals;
+using Voxelized.Engine.Shaders;
 
-namespace Voxelized.Engine.Skybox;
+namespace Voxelized.Engine.Skyboxes;
 public class Skybox {
   private int _textureID;
   private Shader _shader;

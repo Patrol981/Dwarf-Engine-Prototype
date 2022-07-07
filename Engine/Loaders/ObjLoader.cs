@@ -4,10 +4,10 @@ using System.Globalization;
 using System.Text;
 
 using OpenTK.Mathematics;
-using Voxelized.DataStructures;
-using Voxelized.ECS;
+using Voxelized.Engine.DataStructures;
+using Voxelized.Engine.ECS;
 
-namespace Voxelized.Loaders;
+namespace Voxelized.Engine.Loaders;
 
 public class ObjLoader : MeshLoader {
   private string current_material;

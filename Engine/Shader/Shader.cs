@@ -9,7 +9,7 @@ using OpenTK.Windowing.Desktop;
 using OpenTK.Mathematics;
 
 
-namespace Voxelized.Shaders;
+namespace Voxelized.Engine.Shaders;
 
 public class Shader {
   private protected int _handle;

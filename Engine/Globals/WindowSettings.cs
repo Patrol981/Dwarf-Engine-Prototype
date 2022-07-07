@@ -4,7 +4,7 @@ using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
 
-namespace Voxelized.Globals;
+namespace Voxelized.Engine.Globals;
 
 public static class WindowSettings {
   private static NativeWindowSettings s_nativeWindowGameSettings = new NativeWindowSettings {

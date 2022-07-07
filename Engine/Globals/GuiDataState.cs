@@ -1,7 +1,7 @@
-using Voxelized.DataStructures;
-using Voxelized.ECS;
+using Voxelized.Engine.DataStructures;
+using Voxelized.Engine.ECS;
 
-namespace Voxelized.Globals;
+namespace Voxelized.Engine.Globals;
 
 public static class GuiDataState {
   private static Entity _targetEntity = null!;
