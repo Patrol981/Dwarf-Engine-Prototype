@@ -11,7 +11,7 @@ public class SimpleObjLoader : MeshLoader {
   private List<int>? _vertIndices, _normalIndices, _textureIndices;
   private List<Vector2>? _textures;
 
-  public override Mesh Load(string path) {
+  public override MasterMesh Load(string path) {
     _vertices = new();
     _normals = new();
     _vertIndices = new();
@@ -43,6 +43,19 @@ public class SimpleObjLoader : MeshLoader {
       }
     }
 
+    reader.Close();
+    reader = new StreamReader($"{path}.mtl", Encoding.UTF8);
+    while((line = reader.ReadLine()!) != null) {
+      string[] parts = line.Split(" ");
+      switch(parts[0]) {
+        case "Kd":
+          HandleMtlKd(parts);
+          break;
+      }
+    }
+    reader.Close();
+    reader.Dispose();
+
     List<Vector3> finalVertexVec3 = new();
     List<float> finalVertexFloat = new();
     int len = _vertIndices.Count;
@@ -66,7 +79,6 @@ public class SimpleObjLoader : MeshLoader {
     }
 
     Mesh mesh = new Mesh(
-      MeshRenderType.WavefrontObjFile,
       _vertices,
       _normals,
       finalVertexFloat,
@@ -76,7 +88,8 @@ public class SimpleObjLoader : MeshLoader {
 
     mesh.Texture.Use(OpenTK.Graphics.OpenGL4.TextureUnit.Texture0);
 
-    return mesh;
+    MasterMesh masterMesh = new MasterMesh(new List<Mesh> { mesh }, MeshRenderType.WavefrontObjFile);
+    return masterMesh;
   }
 
   internal void HandleVertices(string[] parts) {
@@ -108,5 +121,9 @@ public class SimpleObjLoader : MeshLoader {
       Convert.ToSingle(parts[1], CultureInfo.InvariantCulture),
       Convert.ToSingle(parts[2], CultureInfo.InvariantCulture)
     ));
+  }
+
+  internal void HandleMtlKd(string[] parts) {
+
   }
 }

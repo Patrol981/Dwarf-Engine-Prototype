@@ -12,12 +12,11 @@ uniform mat4 uModel;
 uniform mat4 uProjection;
 uniform mat4 uView;
 
-void main(void)
-{
+void main(void) {
     vFragPos = vec3(uModel * vec4(aPosition, 1.0));
     vNormal = mat3(transpose(inverse(uModel))) * aNormal;
-
-    gl_Position = vec4(aPosition, 1.0) * uModel * uView * uProjection;
     vTexCoord = aTexCoord;
+    gl_Position = vec4(aPosition, 1.0) * uModel * uView * uProjection;
+    
     // gl_Position = uProjection * uView * vec4(vFragPos, 1.0);
 }

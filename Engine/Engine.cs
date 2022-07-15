@@ -69,6 +69,7 @@ public class EngineClass {
           ImGui.PushID(entities[i].GetName());
           if (ImGui.TreeNodeEx(entities[i].GetName())) {
             ImGui.Text($"Model {i} name: {entities[i].GetName()}");
+            ImGui.Text($"Meshes: {entities[i].GetComponent<MasterMesh>().Meshes.Count}");
             var color = entities[i].GetComponent<Material>().GetColor();
             var pos = entities[i].GetComponent<Transform>();
             var cnvVec = new System.Numerics.Vector3(color.X, color.Y, color.Z);
@@ -87,7 +88,8 @@ public class EngineClass {
 
     }
 
-    if (ImGui.Begin("Camera Test")) {
+    if (ImGui.Begin("Camera Test"))
+      if (EntityGlobalState.GetEntities().Count == 0) return;
       var targetTransform = EntityGlobalState.GetEntities()[0].GetComponent<Transform>();
       var cameraTransform = CameraGlobalState.GetCameraEntity().GetComponent<Transform>();
 
@@ -136,4 +138,3 @@ public class EngineClass {
     }
   }
   */
-}

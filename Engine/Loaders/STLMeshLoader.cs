@@ -6,7 +6,7 @@ using Voxelized.Engine.DataStructures;
 namespace Voxelized.Engine.Loaders;
 
 public class STLMeshLoader : MeshLoader {
-  public override Mesh Load(string path) {
+  public override MasterMesh Load(string path) {
     List<float> meshes = new List<float>();
     int triangles = 0;
     int byteIndex = 0;
@@ -45,7 +45,8 @@ public class STLMeshLoader : MeshLoader {
 
     // Mesh mesh = new Mesh(meshes.ToArray(), triangles * 3);
     Mesh mesh = new();
-    return mesh;
+    MasterMesh masterMesh = new MasterMesh();
+    return masterMesh;
   }
 
   Vector3 FromBuff(byte[] fileBytes, int byteIndex) {

@@ -1,10 +1,8 @@
-using OpenTK;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
-
-using Voxelized.Engine.Shaders;
 using Voxelized.Engine.Cameras;
 using Voxelized.Engine.ECS;
+using Voxelized.Engine.Shaders;
 
 namespace Voxelized.Engine.DataStructures;
 
@@ -16,16 +14,17 @@ class MeshRenderer : Component {
 
   public MeshRenderer() {
   }
-  public MeshRenderer Init() {
-    Mesh mesh = Owner!.GetComponent<Mesh>();
-    if (mesh == null) {
-      return this;
+  public MeshRenderer Init(string vs, string fs) {
+    MasterMesh masterMesh = Owner!.GetComponent<MasterMesh>();
+    if (masterMesh == null) {
+      return null!;
     }
 
-    mesh.GetVertexArray();
+    // masterMesh.Meshes[i].GetVertexArray();
 
     _model = Matrix4.Identity;
-    _shader = new Shader("./Shaders/vertexShader.vert", "./Shaders/fragmentShader.frag");
+    _shader = new Shader(vs, fs);
+    // masterMesh.Meshes[i].SetupShader(vs, fs);
 
     _vao = GL.GenVertexArray();
     GL.BindVertexArray(_vao);
@@ -34,57 +33,70 @@ class MeshRenderer : Component {
     GL.BindBuffer(BufferTarget.ArrayBuffer, _vbo);
     GL.BufferData(
       BufferTarget.ArrayBuffer,
-      mesh.BufferDataCount,
-      mesh.VertexArray.ToArray(),
+      masterMesh.BufferDataCount,
+      masterMesh.VertexArray.ToArray(),
       BufferUsageHint.StaticDraw
     );
 
-    if (mesh.Indices != null && mesh.Indices.Count > 0) {
+    if (masterMesh.Indices != null && masterMesh.Indices.Count > 0) {
       _ebo = GL.GenBuffer();
       GL.BindBuffer(BufferTarget.ElementArrayBuffer, _ebo);
 
       GL.BufferData(
         BufferTarget.ElementArrayBuffer,
-        mesh.Indices.Count * sizeof(int),
-        mesh.Indices.ToArray(),
+        masterMesh.Indices.Count * sizeof(int),
+        masterMesh.Indices.ToArray(),
         BufferUsageHint.StaticDraw
       );
     }
 
-    
+
 
     // position
     GL.EnableVertexAttribArray(0);
-    GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, mesh.PackageStrideSize, 0);
+    GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, masterMesh.PackageStrideSize, 0);
 
     // normal
     GL.EnableVertexAttribArray(1);
-    GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, mesh.PackageStrideSize, 3 * sizeof(float));
+    GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, masterMesh.PackageStrideSize, 3 * sizeof(float));
 
     GL.BindBuffer(BufferTarget.ArrayBuffer, _vbo);
 
-    if(mesh.MeshRenderType == Engine.Enums.MeshRenderType.WavefrontObjFile) {
+    if (masterMesh.Meshes[0].Texture != null) {
+      // GL.BindBuffer(BufferTarget.ArrayBuffer, )
+      // GL.BufferData(BufferTarget.ArrayBuffer, mesh.)
+      // 
       //GL.EnableVertexAttribArray(2);
-      GL.VertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, mesh.PackageStrideSize, 6 * sizeof(float));
+      GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
+      GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
+
+      GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
+      GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
 
       var texCoordLocation = _shader.GetAttribLocation("aTexCoord");
-      GL.EnableVertexAttribArray(texCoordLocation);
+      GL.EnableVertexAttribArray(2);
+      GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, masterMesh.PackageStrideSize, 6 * sizeof(float));
+
+      // mesh.Texture = Textures.Texture.LoadFromFile("Resources/container.png");
+      masterMesh.Meshes[0].Texture.Use(TextureUnit.Texture0);
 
       _shader.SetInt("texture0", 0);
-    }
 
-    GL.BindVertexArray(0);
+      GL.BindVertexArray(0);
+    }
 
     return this;
   }
 
   public void Render(Camera camera) {
-    if (Owner!.GetComponent<Mesh>() == null) {
+    if (Owner!.GetComponent<MasterMesh>() == null) {
       return;
     }
 
-    Mesh mesh = Owner!.GetComponent<Mesh>();
-    // mesh.Texture.Use(TextureUnit.Texture0);
+    var masterMesh = Owner!.GetComponent<MasterMesh>();
+    if (masterMesh.MeshRenderType == Engine.Enums.MeshRenderType.WavefrontObjFile) {
+      masterMesh.Meshes[0].Texture.Use(TextureUnit.Texture0);
+    }
     _shader!.Use();
     _shader.SetVector3("aPosition", camera.Owner!.GetComponent<Transform>().Position);
 
@@ -98,31 +110,25 @@ class MeshRenderer : Component {
 
     Matrix4 worldModel = _model * Matrix4.CreateTranslation(Owner.GetComponent<Transform>().Position);
     var qY = Quaternion.FromAxisAngle(Owner.GetComponent<Transform>().Position, Owner.GetComponent<Transform>().Rotation.Y);
-    
+
 
     // var t = Matrix4.CreateTranslation(camera.Owner!.GetComponent<Transform>().Position);
-    var rotY = Matrix4.CreateRotationY(MathHelper.DegreesToRadians(Owner.GetComponent<Transform>().Rotation.Y));
+    var rotY = Matrix4.Identity * Matrix4.CreateRotationY(MathHelper.DegreesToRadians(Owner.GetComponent<Transform>().Rotation.Y));
     //worldModel *= Matrix4.Identity * Matrix4.CreateRotationX((float)MathHelper.DegreesToRadians(Owner.GetComponent<Transform>().Rotation.X));
     //worldModel *= Matrix4.Transpose(Matrix4.CreateRotationY((float)MathHelper.DegreesToRadians(Owner.GetComponent<Transform>().Rotation.Y)));
     //worldModel *= Matrix4.Identity * Matrix4.CreateRotationZ((float)MathHelper.DegreesToRadians(Owner.GetComponent<Transform>().Rotation.Z));
-    worldModel *= (rotY * Matrix4.CreateTranslation(5,0,0));
+    worldModel *= (rotY);
     _shader.SetMatrix4("uModel", worldModel);
 
     GL.BindVertexArray(_vao);
     //Console.WriteLine(Owner.GetComponent<Mesh>().DrawCount);
     // GL.DrawArrays(PrimitiveType.Triangles, 0, Owner.GetComponent<Mesh>().DrawCount);
-    if(mesh.MeshRenderType == Engine.Enums.MeshRenderType.Terrain) {
-      GL.DrawElements(PrimitiveType.Triangles, mesh.VertexArray.Count, DrawElementsType.UnsignedInt, 0);
+    if (masterMesh.MeshRenderType == Engine.Enums.MeshRenderType.Terrain) {
+      GL.DrawElements(PrimitiveType.Triangles, masterMesh.VertexArray.Count, DrawElementsType.UnsignedInt, 0);
     } else {
-      GL.DrawArrays(PrimitiveType.Triangles, 0, Owner.GetComponent<Mesh>().DrawCount);
+      GL.DrawArrays(PrimitiveType.Triangles, 0, masterMesh.DrawCount);
     }
-    
-  }
 
-  public Shader GetShader() {
-    if (_shader == null) {
-      return null!;
-    }
-    return _shader;
+
   }
 }

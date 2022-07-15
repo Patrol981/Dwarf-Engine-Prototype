@@ -30,7 +30,7 @@ internal class MeshGenerator : Component {
   public MeshGenerator() {
   }
 
-  public Mesh SetupPlane(int gridX, int gridY, float size = 100, int vertexCount = 32) {
+  public MasterMesh SetupPlane(int gridX, int gridY, float size = 100, int vertexCount = 32) {
     _size = size;
     _vertexCount = vertexCount;
 
@@ -82,11 +82,14 @@ internal class MeshGenerator : Component {
 
 
     // Mesh mesh = new Mesh(normals, null, vertices, indices, null, null, null);
-    Mesh mesh = Owner!.GetComponent<Mesh>();
-    if (mesh == null) {
-      mesh = new Mesh();
-      Owner!.AddComponent(mesh);
+    MasterMesh masterMesh = Owner!.GetComponent<MasterMesh>();
+    if (masterMesh == null) {
+      masterMesh = new MasterMesh();
+      Owner!.AddComponent(masterMesh);
     }
+
+    Mesh mesh = new();
+
     _model = Matrix4.Identity;
     _shader = new Shader("./Shaders/vertexShader.vert", "./Shaders/fragmentShader.frag");
 
@@ -116,7 +119,7 @@ internal class MeshGenerator : Component {
             vertices[i + 2],
             normals[i],
             normals[i + 1],
-            normals[i + 2]
+            normals[i + 2],
           }
       );
       
@@ -126,16 +129,20 @@ internal class MeshGenerator : Component {
     mesh.Normals = norms;
     mesh.VertexArray = _vertexArray;
     mesh.Indices = _indices;
-    mesh.MeshRenderType = Enums.MeshRenderType.Terrain;
 
-    mesh.CalculateVertexArray(mesh.MeshRenderType);
+    // mesh.CalculateVertexArray(mesh.MeshRenderType);
 
-    return mesh;
+    mesh.Texture = Textures.Texture.LoadFromFile("Resources/grass.png");
 
+    masterMesh.Meshes.Add(mesh);
+    masterMesh.MeshRenderType = Enums.MeshRenderType.Terrain;
+    masterMesh.RecalculateMeshes();
+    return masterMesh;
   }
 
+  /*
   public void Render(Camera camera) {
-    if (Owner!.GetComponent<Mesh>() == null) {
+    if (Owner!.GetComponent<MasterMesh>() == null) {
       return;
     }
 
@@ -159,4 +166,5 @@ internal class MeshGenerator : Component {
     // GL.DrawArrays(PrimitiveType.Triangles, 0, mesh.VertexArray.Count);
     GL.DrawElements(PrimitiveType.Triangles, mesh.VertexArray.Count, DrawElementsType.UnsignedInt, 0);
   }
+  */
 }

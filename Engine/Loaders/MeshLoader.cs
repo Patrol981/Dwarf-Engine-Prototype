@@ -4,7 +4,7 @@ using Voxelized.Engine.DataStructures;
 namespace Voxelized.Engine.Loaders;
 
 public abstract class MeshLoader {
-  public virtual Mesh Load(string path) {
+  public virtual MasterMesh Load(string path) {
     return null!;
   }
 }
