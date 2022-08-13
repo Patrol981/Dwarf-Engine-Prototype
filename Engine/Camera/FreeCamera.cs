@@ -5,11 +5,11 @@ using OpenTK.Graphics;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Mathematics;
 
-using Voxelized.Engine.Globals;
-using Voxelized.Engine.Enums;
-using Voxelized.Engine.ECS;
+using Dwarf.Engine.Globals;
+using Dwarf.Engine.Enums;
+using Dwarf.Engine.ECS;
 
-namespace Voxelized.Engine.Cameras;
+namespace Dwarf.Engine.Cameras;
 
 public class FreeCamera : Camera, ICamera {
   public FreeCamera(Vector3 postion, float aspectRatio) : base(postion, aspectRatio) {}

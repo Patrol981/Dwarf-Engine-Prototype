@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using OpenTK.Graphics.OpenGL4;
 
-namespace Voxelized.Engine.GUI;
+namespace Dwarf.Engine.GUI;
 
 static class Util {
   [Pure]

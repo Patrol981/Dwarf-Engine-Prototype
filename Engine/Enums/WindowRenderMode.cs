@@ -1,4 +1,4 @@
-namespace Voxelized.Engine.Enums;
+namespace Dwarf.Engine.Enums;
 
 public enum WindowRenderMode {
   Normal,

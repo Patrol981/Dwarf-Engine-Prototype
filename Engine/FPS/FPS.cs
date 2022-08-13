@@ -2,9 +2,9 @@ using OpenTK.Graphics.OpenGL4;
 using OpenTK.Graphics.GL;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
-using Voxelized.Engine.Globals;
+using Dwarf.Engine.Globals;
 
-namespace Voxelized.Engine.Info;
+namespace Dwarf.Engine.Info;
 
 public class FPS {
   double lastTime = GLFW.GetTime();

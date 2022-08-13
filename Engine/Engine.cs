@@ -1,24 +1,26 @@
 using ImGuiNET;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Desktop;
-using Voxelized.Engine.Cameras;
-using Voxelized.Engine.DataStructures;
-using Voxelized.Engine.ECS;
-using Voxelized.Engine.Globals;
-using Voxelized.Engine.Info;
-using Voxelized.Engine.Skyboxes;
-using Voxelized.Engine.Scenes;
+using Dwarf.Engine.Cameras;
+using Dwarf.Engine.DataStructures;
+using Dwarf.Engine.ECS;
+using Dwarf.Engine.Globals;
+using Dwarf.Engine.Info;
+using Dwarf.Engine.Skyboxes;
+using Dwarf.Engine.Scenes;
+using Dwarf.Engine.Primitives;
 
-namespace Voxelized.Engine;
+namespace Dwarf.Engine;
 
 public class EngineClass {
   private Windowing.Window _window;
   private Scene _scene;
   private FPS _fps;
   private Skybox _skybox;
+  private Cube? _cube;
 
   public EngineClass() {
-    _window = new Voxelized.Engine.Windowing.Window(GameWindowSettings.Default, WindowSettings.GetNativeWindowSettings());
+    _window = new Dwarf.Engine.Windowing.Window(GameWindowSettings.Default, WindowSettings.GetNativeWindowSettings());
     WindowGlobalState.SetWindow(_window);
 
     _window.BindUpdateCallback(OnUpdate);
@@ -31,6 +33,8 @@ public class EngineClass {
     _fps = new FPS();
 
     _skybox = new Skybox(_window.Size.X / (float)_window.Size.Y);
+
+    _cube = new Cube(false);
 
   }
 
@@ -50,8 +54,10 @@ public class EngineClass {
     _skybox.Update((Camera)camera);
     // MouseSelect();
     for (int i = 0; i < _scene.Entities.Count; i++) {
-      _scene.Entities[i].GetComponent<MeshRenderer>().Render((Camera)camera);
+    _scene.Entities[i].GetComponent<MeshRenderer>().Render((Camera)camera);
     }
+
+    _cube!.Redner((Camera)camera);
   }
 
   public void OnResize() {
@@ -63,13 +69,17 @@ public class EngineClass {
     if (ImGui.BeginMainMenuBar()) {
       ImGui.Text($"FPS: {FPSState.GetFrames()}");
 
+      /*
       if (ImGui.BeginMenu("Debug Data")) {
         var entities = EntityGlobalState.GetEntities();
         for (int i = 0; i < entities.Count; i++) {
           ImGui.PushID(entities[i].GetName());
           if (ImGui.TreeNodeEx(entities[i].GetName())) {
             ImGui.Text($"Model {i} name: {entities[i].GetName()}");
-            ImGui.Text($"Meshes: {entities[i].GetComponent<MasterMesh>().Meshes.Count}");
+            // ImGui.Text($"Meshes: {entities[i].GetComponent<MasterMesh>().Meshes.Count}");
+            //for(int x=0; x< entities[i].GetComponent<MasterMesh>().Meshes.Count; x++) {
+            //  ImGui.Text($"Indices {x}: {entities[i].GetComponent<MasterMesh>().Meshes[x].Indices.Count}");
+            //}
             var color = entities[i].GetComponent<Material>().GetColor();
             var pos = entities[i].GetComponent<Transform>();
             var cnvVec = new System.Numerics.Vector3(color.X, color.Y, color.Z);
@@ -84,11 +94,13 @@ public class EngineClass {
           }
         }
       }
+      */
 
 
     }
 
-    if (ImGui.Begin("Camera Test"))
+    /*
+    if (ImGui.Begin("Camera Test")) {
       if (EntityGlobalState.GetEntities().Count == 0) return;
       var targetTransform = EntityGlobalState.GetEntities()[0].GetComponent<Transform>();
       var cameraTransform = CameraGlobalState.GetCameraEntity().GetComponent<Transform>();
@@ -98,7 +110,9 @@ public class EngineClass {
       ImGui.Text("Target");
       ImGui.Text($"X:{targetTransform.Position.X} Y:{targetTransform.Position.Y} Z:{targetTransform.Position.Z}");
     }
+    */
   }
+}
 
   /*
   private void MouseSelect() {

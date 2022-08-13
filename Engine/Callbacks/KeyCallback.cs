@@ -3,9 +3,9 @@ using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
-using Voxelized.Engine.Globals;
+using Dwarf.Engine.Globals;
 
-namespace Voxelized.Callbacks;
+namespace Dwarf.Callbacks;
 
 public static class KeyCallback {
 

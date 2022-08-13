@@ -1,4 +1,4 @@
-namespace Voxelized.Engine.DataStructures;
+namespace Dwarf.Engine.DataStructures;
 
 public abstract class GuiElement {
   private string _name;

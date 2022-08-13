@@ -5,10 +5,10 @@ using OpenTK.Windowing.Desktop;
 using OpenTK.Mathematics;
 
 
-using Voxelized.Engine.Globals;
-using Voxelized.Engine.GUI;
+using Dwarf.Engine.Globals;
+using Dwarf.Engine.GUI;
 
-namespace Voxelized.Engine.Windowing;
+namespace Dwarf.Engine.Windowing;
 
 public delegate void onEventCallback();
 
@@ -45,7 +45,7 @@ public class Window : GameWindow {
 
   public void Clear(Vector3 color) {
     GL.ClearColor(color.X, color.Y, color.Z, 1.0f);
-    GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
+    GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit | ClearBufferMask.StencilBufferBit);
   }
 
   protected unsafe override void OnUpdateFrame(FrameEventArgs args) {
@@ -68,7 +68,6 @@ public class Window : GameWindow {
         CursorVisible = WindowGlobalState.GetCursorVisible();
         break;
       case false:
-        // CursorVisible = WindowGlobalState.GetCursorVisible();
         CursorGrabbed = WindowGlobalState.GetCursorGrabbed();
         break;
     }
@@ -78,13 +77,11 @@ public class Window : GameWindow {
 
     Clear();
     //GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-
+    //_controller.Render();
     _onRender?.Invoke();
 
     _controller.Update(this, (float)args.Time);
     _onDrawGUI?.Invoke();
-    // ImGuiNET.ImGui.ShowDemoWindow();
-    _controller.Render();
 
     GLFW.SwapBuffers(this.WindowPtr);
   }
@@ -101,21 +98,17 @@ public class Window : GameWindow {
 
     GL.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     GL.Enable(EnableCap.DepthTest);
+    GL.Disable(EnableCap.Blend);
     WindowGlobalState.SetMouseState(MouseState);
     WindowGlobalState.SetKeyboardState(KeyboardState);
     WindowGlobalState.SetCursorVisible(false);
 
-   // _controller = new GUIController(Size.X, Size.Y);
    _controller = new GUIController(ClientSize.X, ClientSize.Y);
-
-    // CursorGrabbed = WindowGlobalState.GetCursorVisible();
   }
 
   protected override void OnUnload() {
     base.OnUnload();
     GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-    // GL.DeleteBuffer(_vbo);
-    // _shader!.Dispose();
   }
 
   protected override void OnMouseMove(MouseMoveEventArgs e) {

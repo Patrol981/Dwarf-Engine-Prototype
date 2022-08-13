@@ -9,7 +9,7 @@ using OpenTK.Windowing.Desktop;
 using OpenTK.Mathematics;
 
 
-namespace Voxelized.Engine.Shaders;
+namespace Dwarf.Engine.Shaders;
 
 public class Shader {
   private protected int _handle;
@@ -59,6 +59,10 @@ public class Shader {
 
   public void Use() {
     GL.UseProgram(_handle);
+  }
+
+  public int GetHandle() {
+    return _handle;
   }
 
   private static void CompileShader(int shader) {

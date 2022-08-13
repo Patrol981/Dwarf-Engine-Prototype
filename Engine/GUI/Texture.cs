@@ -16,7 +16,7 @@ find a way to port this bad boy into linux
 (System.Drawing.Common works onnly on Windows)
 */
 
-namespace Voxelized.Engine.GUI;
+namespace Dwarf.Engine.GUI;
 
 public enum TextureCoordinate {
   S = TextureParameterName.TextureWrapS,

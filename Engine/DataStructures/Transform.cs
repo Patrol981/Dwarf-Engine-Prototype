@@ -1,6 +1,6 @@
 using OpenTK.Mathematics;
 
-namespace Voxelized.Engine.ECS;
+namespace Dwarf.Engine.ECS;
 
 class Transform : Component {
   public Vector3 Position;

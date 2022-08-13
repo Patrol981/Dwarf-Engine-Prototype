@@ -1,11 +1,11 @@
 using OpenTK.Mathematics;
 
-using Voxelized.Engine.Cameras;
-using Voxelized.Engine.Enums;
-using Voxelized.Engine.ECS;
-using Voxelized.Engine.DataStructures;
+using Dwarf.Engine.Cameras;
+using Dwarf.Engine.Enums;
+using Dwarf.Engine.ECS;
+using Dwarf.Engine.DataStructures;
 
-namespace Voxelized.Engine.Globals;
+namespace Dwarf.Engine.Globals;
 
 public static class CameraGlobalState {
   private static Camera? _camera;

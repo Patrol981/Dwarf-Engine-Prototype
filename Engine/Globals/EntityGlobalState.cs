@@ -1,7 +1,7 @@
-using Voxelized.Engine.ECS;
-using Voxelized.Engine.DataStructures;
+using Dwarf.Engine.ECS;
+using Dwarf.Engine.DataStructures;
 
-namespace Voxelized.Engine.Globals;
+namespace Dwarf.Engine.Globals;
 public static class EntityGlobalState {
   private static List<Entity>? _entities;
 

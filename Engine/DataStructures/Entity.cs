@@ -1,6 +1,6 @@
-using Voxelized.Engine.ECS;
+using Dwarf.Engine.ECS;
 
-namespace Voxelized.Engine.DataStructures;
+namespace Dwarf.Engine.DataStructures;
 
 public class Entity {
   private ComponentManager _componentManager;

@@ -1,110 +1,151 @@
-using System.Linq;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Text;
-
+using Assimp;
 using OpenTK.Mathematics;
-using Voxelized.Engine.DataStructures;
-using Voxelized.Engine.ECS;
+using Dwarf.Engine.DataStructures;
 
-namespace Voxelized.Engine.Loaders;
-
+namespace Dwarf.Engine.Loaders;
 public class ObjLoader : MeshLoader {
-  private string current_material;
-  public List<Vector3> Vertices, Normals, ColorPerIndex, FinalVertexArray;
-  public List<int> Indices, NormalIndices;
-  private Dictionary<string, Vector3> Materials;
-  private Dictionary<string, int> MaterialsIndices;
-  public Vector3 Position;
-  public int counter;
-  public float MaxX, MinX, MaxY, MinY, MaxZ, MinZ;
-  public Vector3 ExtremeMin, ExtremeMax;
-  public Mesh LoadObj(string path) {
-    string line;
+  private readonly AssimpContext _assimpContext;
+  private readonly ConsoleLogStream _logger;
 
-    Vertices = new();
-    Normals = new();
-    ColorPerIndex = new();
-    FinalVertexArray = new();
-    Indices = new();
-    NormalIndices = new();
-    Materials = new();
-    MaterialsIndices = new();
-    current_material = "";
+  public ObjLoader() {
+    _assimpContext = new AssimpContext();
 
-    StreamReader materialreader = new StreamReader($"{path}.mtl", Encoding.UTF8);
-    string current_material_name = "", material_line;
-    while ((material_line = materialreader.ReadLine()) != null) {
-      string[] substrings = material_line.Split(" ");
-      switch (substrings[0]) {
-        case "newmtl":
-          current_material_name = substrings[1];
-          break;
-        case "Kd":
-          var color = new Vector3(Convert.ToSingle(substrings[1], CultureInfo.InvariantCulture),
-              Convert.ToSingle(substrings[2], CultureInfo.InvariantCulture),
-              Convert.ToSingle(substrings[3], CultureInfo.InvariantCulture));
-          Materials.Add(current_material_name, color);
-          MaterialsIndices.Add(current_material_name, Materials.Count - 1);
-          break;
-      }
-    }
-
-    StreamReader reader = new StreamReader($"{path}.obj", Encoding.UTF8);
-    while ((line = reader.ReadLine()) != null) {
-      string[] substrings = line.Split(" ");
-      switch (substrings[0]) {
-        case "v":
-          var XPos = Convert.ToSingle(substrings[1], CultureInfo.InvariantCulture);
-          var YPos = Convert.ToSingle(substrings[2], CultureInfo.InvariantCulture);
-          var ZPos = Convert.ToSingle(substrings[3], CultureInfo.InvariantCulture);
-          if (XPos > MaxX)
-            MaxX = XPos;
-          if (XPos < MinX)
-            MinX = XPos;
-          if (YPos > MaxY)
-            MaxY = YPos;
-          if (YPos < MinY)
-            MinY = YPos;
-          if (ZPos > MaxZ)
-            MaxZ = ZPos;
-          if (ZPos < MinZ)
-            MinZ = ZPos;
-          Vertices.Add((XPos, YPos, ZPos));
-          break;
-        case "vt":
-          //TextureCoordinates.Add((Convert.ToSingle(substrings[1], CultureInfo.InvariantCulture),
-          //Convert.ToSingle(substrings[2], CultureInfo.InvariantCulture)));
-          break;
-        case "vn":
-          Normals.Add((Convert.ToSingle(substrings[1], CultureInfo.InvariantCulture),
-              Convert.ToSingle(substrings[2], CultureInfo.InvariantCulture),
-              Convert.ToSingle(substrings[3], CultureInfo.InvariantCulture)));
-          break;
-        case "f":
-          SplitFLine(substrings);
-          break;
-        case "usemtl":
-          current_material = substrings[1];
-          break;
-      }
-    }
-
-    ExtremeMin = (MinX, MinY, MinZ);
-    ExtremeMax = (MaxX, MaxY, MaxZ);
-
-    // Mesh mesh = new Mesh(Engine.Enums.MeshRenderType.WavefrontObjFile, Normals, ColorPerIndex, Vertices, Indices, NormalIndices, Materials, MaterialsIndices);
-    Mesh mesh = new Mesh();
-
-    return mesh;
+    Assimp.LogStream.IsVerboseLoggingEnabled = true;
+    _logger = new Assimp.ConsoleLogStream();
+    _logger.Attach();
   }
 
-  private void SplitFLine(string[] line) {
-    for (int i = 1; i < line.Length; i++) {
-      string[] vertex = line[i].Split("/");
-      Indices.Add(Convert.ToInt32(vertex[0]) - 1);
-      NormalIndices.Add(Convert.ToInt32(vertex[2]) - 1);
-      ColorPerIndex.Add(Materials[current_material]);
+  public override MasterMesh Load(string path) {
+    var scene = _assimpContext.ImportFile($"{path}.obj");
+
+    _logger.Detach();
+
+    List<DataStructures.Mesh> meshes = new();
+
+    var node = scene.RootNode;
+
+    foreach (var child in node.Children) {
+      foreach (int index in child.MeshIndices) {
+        List<Vector3> posList = new();
+        List<Color4> colorList = new();
+        List<Vector3> texList = new();
+        List<Vector3> normalList = new();
+
+        var aMesh = scene.Meshes[index];
+
+        foreach (Face face in aMesh.Faces) {
+          for (int i = 0; i < face.IndexCount; i++) {
+            int indice = face.Indices[i];
+
+            bool hasColors = aMesh.HasVertexColors(0);
+            bool hasTexCoords = aMesh.HasTextureCoords(0);
+
+            if (hasColors) {
+              Color4 vertColor = FromColor(aMesh.VertexColorChannels[0][indice]);
+              colorList.Add(vertColor);
+            }
+            if (aMesh.HasNormals) {
+              Vector3 normal = FromVector(aMesh.Normals[indice]);
+              normalList.Add(normal);
+            }
+            if (hasTexCoords) {
+              Vector3 uvw = FromVector(aMesh.TextureCoordinateChannels[0][indice]);
+              texList.Add(uvw);
+            }
+            Vector3 pos = FromVector(aMesh.Vertices[indice]);
+            posList.Add(pos);
+          }
+        }
+
+        DataStructures.Mesh mesh = new(
+            posList,
+            colorList,
+            texList,
+            normalList,
+            null!
+            //Textures.Texture.LoadFromFile("Resources/grass.png")
+        );
+
+        meshes.Add(mesh);
+      }
     }
+
+    MasterMesh masterMesh = new(meshes, Enums.MeshRenderType.FbxModel);
+    return masterMesh;
+  }
+
+  public MasterMesh OldLoad(string path) {
+    var scene = _assimpContext.ImportFile($"{path}.obj");
+
+    Console.WriteLine(scene.RootNode);
+
+    _logger.Detach();
+
+    Console.WriteLine(scene.MeshCount);
+
+    List<DataStructures.Mesh> meshes = new();
+
+    for (int i = 0; i < scene.MeshCount; i++) {
+      List<float> verts = new();
+      List<OpenTK.Mathematics.Vector3> normals = new();
+      List<OpenTK.Mathematics.Vector3> vec3Verts = new();
+      List<int> indices = new();
+      var aMesh = scene.Meshes[i];
+
+      indices = (aMesh.GetIndices().ToList());
+
+      for (int j = 0; j < aMesh.Vertices.Count; j++) {
+        verts.AddRange(new float[] {
+          aMesh.Vertices[j].X, aMesh.Vertices[j].Y, aMesh.Vertices[j].Z,
+          aMesh.Normals[j].X, aMesh.Normals[j].Y, aMesh.Normals[j].Z,
+          //aMesh.VertexColorChannels[i][indices[j]].R,
+          //aMesh.VertexColorChannels[i][indices[j]].G,
+          //aMesh.VertexColorChannels[0][indices[j]].B,
+          aMesh.TextureCoordinateChannels[i][indices[j]].X,
+          aMesh.TextureCoordinateChannels[i][indices[j]].Y,
+          //aMesh.TextureCoordinateChannels[i][indices[j]].Z,
+        });
+
+        vec3Verts.Add(new OpenTK.Mathematics.Vector3(
+          aMesh.Vertices[j].X, aMesh.Vertices[j].Y, aMesh.Vertices[j].Z)
+        );
+      }
+
+      for (int j = 0; j < aMesh.Normals.Count; j++) {
+        normals.Add(new OpenTK.Mathematics.Vector3(
+          aMesh.Normals[j].X, aMesh.Normals[j].Y, aMesh.Normals[j].Z)
+        );
+      }
+      /*
+      DataStructures.Mesh mesh = new(
+          vec3Verts,
+          normals,
+          verts,
+          indices
+        );
+      */
+
+      //meshes.Add(mesh);
+    }
+
+    MasterMesh masterMesh = new(meshes, Enums.MeshRenderType.WavefrontObjFile);
+    return masterMesh;
+  }
+
+  private Vector3 FromVector(Vector3D vec) {
+    Vector3 v;
+    v.X = vec.X;
+    v.Y = vec.Y;
+    v.Z = vec.Z;
+    return v;
+  }
+
+  private Color4 FromColor(Color4D color) {
+    Color4 c;
+    c.R = color.R;
+    c.G = color.G;
+    c.B = color.B;
+    c.A = color.A;
+    return c;
   }
 }

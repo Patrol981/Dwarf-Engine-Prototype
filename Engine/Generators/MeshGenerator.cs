@@ -1,11 +1,11 @@
 ﻿using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
-using Voxelized.Engine.Cameras;
-using Voxelized.Engine.DataStructures;
-using Voxelized.Engine.ECS;
-using Voxelized.Engine.Shaders;
+using Dwarf.Engine.Cameras;
+using Dwarf.Engine.DataStructures;
+using Dwarf.Engine.ECS;
+using Dwarf.Engine.Shaders;
 
-namespace Voxelized.Engine.Generators;
+namespace Dwarf.Engine.Generators;
 internal class MeshGenerator : Component {
   private float _size;
   private int _vertexCount;
@@ -19,12 +19,11 @@ internal class MeshGenerator : Component {
   protected float X;
   protected float Y;
   protected Mesh Mesh = new();
-  protected Texture Texture = new();
 
   List<float> _vertices = new();
   List<float> _normals = new();
   List<int> _indices = new();
-  List<float> _vertexArray = new();
+  List<Vertex> _vertexArray = new();
   int _count;
 
   public MeshGenerator() {
@@ -110,8 +109,12 @@ internal class MeshGenerator : Component {
     }
 
     for (int i = 0; i < _vertices.Count; i += 3) {
-     //_vertexArray.AddRange(new float[] { vertices[i], vertices[i + 1], vertices[i + 2] });
-     //_vertexArray.AddRange(new float[] { normals[i], normals[i + 1], normals[i + 2] });
+      //_vertexArray.AddRange(new float[] { vertices[i], vertices[i + 1], vertices[i + 2] });
+      //_vertexArray.AddRange(new float[] { normals[i], normals[i + 1], normals[i + 2] });
+      Vertex v = new();
+      v.Position = new Vector3(vertices[i], vertices[i + 1], vertices[i+2]);
+      v.Normal = new Vector3(normals[i], normals[i + 1], normals[i + 2]);
+      /*
       _vertexArray.AddRange(
           new float[] {
             vertices[i],
@@ -122,7 +125,11 @@ internal class MeshGenerator : Component {
             normals[i + 2],
           }
       );
-      
+      */
+
+      _vertexArray.Add(v);
+
+
     }
 
     mesh.Vertices = verts.ToList();

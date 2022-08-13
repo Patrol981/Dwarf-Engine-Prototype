@@ -1,11 +1,8 @@
 ﻿using Assimp;
-using Assimp.Configs;
-using Assimp.Unmanaged;
+using OpenTK.Mathematics;
+using Dwarf.Engine.DataStructures;
 
-using Voxelized.Engine.DataStructures;
-using Voxelized.Engine.Enums;
-
-namespace Voxelized.Engine.Loaders;
+namespace Dwarf.Engine.Loaders;
 public class FbxLoader : MeshLoader {
   private readonly AssimpContext _assimpContext;
   private readonly ConsoleLogStream _logger;
@@ -24,44 +21,79 @@ public class FbxLoader : MeshLoader {
 
     _logger.Detach();
 
-    Console.WriteLine(scene.MeshCount);
-
     List<DataStructures.Mesh> meshes = new();
 
-    for(int i = 0; i < scene.MeshCount; i++) {
-      List<float> verts = new();
-      List<OpenTK.Mathematics.Vector3> normals = new();
-      List<OpenTK.Mathematics.Vector3> vec3Verts = new();
-      var aMesh = scene.Meshes[i];
+    var node = scene.RootNode;
 
-      for (int j = 0; j < aMesh.Vertices.Count; j++) {
-        verts.AddRange(new float[] {
-          aMesh.Vertices[j].X, aMesh.Vertices[j].Y, aMesh.Vertices[j].Z,
-          aMesh.Normals[j].X, aMesh.Normals[j].Y, aMesh.Normals[j].Z
-        });
+    foreach(var child in node.Children) {
+      foreach (int index in child.MeshIndices) {
+        List<Vector3> posList = new();
+        List<Color4> colorList = new();
+        List<Vector3> texList = new();
+        List<Vector3> normalList = new();
+        List<int> indices = new();
 
-        vec3Verts.Add(new OpenTK.Mathematics.Vector3(
-          aMesh.Vertices[j].X, aMesh.Vertices[j].Y, aMesh.Vertices[j].Z)
+        var aMesh = scene.Meshes[index];
+
+        foreach (Face face in aMesh.Faces) {
+          for (int i = 0; i < face.IndexCount; i++) {
+            int indice = face.Indices[i];
+
+            indices.Add(indice);
+
+            bool hasColors = aMesh.HasVertexColors(0);
+            bool hasTexCoords = aMesh.HasTextureCoords(0);
+
+            if (hasColors) {
+              Color4 vertColor = FromColor(aMesh.VertexColorChannels[0][indice]);
+              colorList.Add(vertColor);
+            }
+            if (aMesh.HasNormals) {
+              Vector3 normal = FromVector(aMesh.Normals[indice]);
+              normalList.Add(normal);
+            }
+            if (hasTexCoords) {
+              Vector3 uvw = FromVector(aMesh.TextureCoordinateChannels[0][indice]);
+              texList.Add(uvw);
+            }
+            Vector3 pos = FromVector(aMesh.Vertices[indice]);
+            posList.Add(pos);
+          }
+        }
+
+        DataStructures.Mesh mesh = new(
+            posList,
+            colorList,
+            texList,
+            normalList,
+            indices,
+            null!,
+            Textures.Texture.FastTextureLoad("Resources/grass.png"),
+            aMesh.Name
         );
+
+        meshes.Add(mesh);
       }
-
-      for (int j = 0; j < aMesh.Normals.Count; j++) {
-        normals.Add(new OpenTK.Mathematics.Vector3(
-          aMesh.Normals[j].X, aMesh.Normals[j].Y, aMesh.Normals[j].Z)
-        );
-      }
-
-      DataStructures.Mesh mesh = new(
-        vec3Verts,
-        normals,
-        verts
-      );
-
-      meshes.Add(mesh);
     }
-
 
     MasterMesh masterMesh = new(meshes, Enums.MeshRenderType.FbxModel);
     return masterMesh;
+  }
+
+  private Vector3 FromVector(Vector3D vec) {
+    Vector3 v;
+    v.X = vec.X;
+    v.Y = vec.Y;
+    v.Z = vec.Z;
+    return v;
+  }
+
+  private Color4 FromColor(Color4D color) {
+    Color4 c;
+    c.R = color.R;
+    c.G = color.G;
+    c.B = color.B;
+    c.A = color.A;
+    return c;
   }
 }

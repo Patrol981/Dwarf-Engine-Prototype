@@ -1,8 +1,8 @@
-using Voxelized.Engine.DataStructures;
-using Voxelized.Engine.ECS;
-using Voxelized.Engine.Loaders;
+using Dwarf.Engine.DataStructures;
+using Dwarf.Engine.ECS;
+using Dwarf.Engine.Loaders;
 
-namespace Voxelized.Engine.Scenes;
+namespace Dwarf.Engine.Scenes;
 
 public abstract class Scene {
   public List<Entity> Entities;

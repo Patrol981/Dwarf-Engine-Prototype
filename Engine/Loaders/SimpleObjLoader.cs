@@ -2,10 +2,10 @@
 using System.Text;
 using OpenTK.Mathematics;
 
-using Voxelized.Engine.DataStructures;
-using Voxelized.Engine.Enums;
+using Dwarf.Engine.DataStructures;
+using Dwarf.Engine.Enums;
 
-namespace Voxelized.Engine.Loaders;
+namespace Dwarf.Engine.Loaders;
 public class SimpleObjLoader : MeshLoader {
   private List<Vector3>? _vertices, _normals;
   private List<int>? _vertIndices, _normalIndices, _textureIndices;
@@ -56,20 +56,23 @@ public class SimpleObjLoader : MeshLoader {
     reader.Close();
     reader.Dispose();
 
-    List<Vector3> finalVertexVec3 = new();
+    List<Vertex> finalVertexVec3 = new();
     List<float> finalVertexFloat = new();
     int len = _vertIndices.Count;
 
     for(int i=0; i< len; i++) {
-      finalVertexVec3.Add(_vertices[_vertIndices[i] - 1]);
-      finalVertexVec3.Add(_normals[_normalIndices[i] - 1]);
-      finalVertexVec3.Add(
-        new Vector3(_textures[_textureIndices[i] - 1].X,
-        _textures[_textureIndices[i] - 1].Y, 
-        0
-      ));
+      Vertex v = new();
+
+      v.Position = (_vertices[_vertIndices[i] - 1]);
+      v.Normal =  (_normals[_normalIndices[i] - 1]);
+      //v.TextureCoords = (
+       // new Vector3(_textures[_textureIndices[i] - 1].X,
+       // _textures[_textureIndices[i] - 1].Y, 
+       // 0
+      //));
     }
 
+    /*
     for (int i=0; i < finalVertexVec3.Count; i+=3) {
       finalVertexFloat.AddRange(new float[] {
         finalVertexVec3[i].X, finalVertexVec3[i].Y, finalVertexVec3[i].Z, // position
@@ -77,14 +80,16 @@ public class SimpleObjLoader : MeshLoader {
         finalVertexVec3[i+2].X, finalVertexVec3[i+2].Y // texture
       });
     }
+    */
 
     Mesh mesh = new Mesh(
       _vertices,
       _normals,
-      finalVertexFloat,
+      finalVertexVec3,
       null!,
       Textures.Texture.LoadFromFile($"{path}.png")
     );
+
 
     mesh.Texture.Use(OpenTK.Graphics.OpenGL4.TextureUnit.Texture0);
 

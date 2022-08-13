@@ -1,6 +1,6 @@
 using OpenTK.Mathematics;
 
-namespace Voxelized.Engine.ECS;
+namespace Dwarf.Engine.ECS;
 
 class Material : Component {
   private Vector3 _color;

@@ -1,7 +1,7 @@
-using Voxelized.Engine.DataStructures;
-using Voxelized.Engine.ECS;
+using Dwarf.Engine.DataStructures;
+using Dwarf.Engine.ECS;
 
-namespace Voxelized.Engine.Globals;
+namespace Dwarf.Engine.Globals;
 
 public static class GuiDataState {
   private static Entity _targetEntity = null!;

@@ -5,7 +5,7 @@ using OpenTK.Graphics;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Mathematics;
 
-namespace Voxelized.Engine.Globals;
+namespace Dwarf.Engine.Globals;
 
 public static class WindowGlobalState {
   private static double _time;

@@ -1,10 +1,14 @@
-using Voxelized.Engine.ECS;
-using Voxelized.Engine.DataStructures;
+using Dwarf.Engine.ECS;
+using Dwarf.Engine.DataStructures;
 
-namespace Voxelized.Engine.Loaders;
+namespace Dwarf.Engine.Loaders;
 
 public abstract class MeshLoader {
   public virtual MasterMesh Load(string path) {
+    return null!;
+  }
+
+  public virtual async Task<MasterMesh> LoadAsync(string path) {
     return null!;
   }
 }
