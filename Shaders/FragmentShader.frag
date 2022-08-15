@@ -17,5 +17,5 @@ void main()
 
     float cc = max(abs(dot(viewDir,norm)), 0.3f);
     vec3 res = vec3(cc*uDiffuse);
-    vFragColor = texture(texture1, texCoord);
+    vFragColor = texture(texture1, texCoord) * vec4(res, 1);
 }

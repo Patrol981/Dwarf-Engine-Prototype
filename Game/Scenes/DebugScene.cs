@@ -48,15 +48,15 @@ public class DebugScene : Scene {
     int offsetX = 15;
     int offsetY = 15;
 
-    /*
+ 
     for(int i=0; i<15; i++) {
       var monu1 = new Entity();
+      monu1.SetName("monu1");
       monu1.AddComponent(new Transform(new Vector3(offsetX, 0, offsetY)));
-      monu1.AddComponent(new Material(new Vector3(1f, 0.2f, 0.0f)));
-      monu1.AddComponent(new SimpleObjLoader().Load("Resources/monu1"));
+      monu1.AddComponent(new Material(new Vector3(1f, 1f, 1f)));
+      monu1.AddComponent(new ObjLoader().Load($"Resources/{monu1.GetName()}"));
       monu1.AddComponent(new MeshRenderer());
       monu1.GetComponent<MeshRenderer>().Init("./Shaders/vertexShader.vert", "./Shaders/fragmentShader.frag");
-      monu1.SetName("monu1");
       Entities.Add(monu1);
       if(offsetX > 60) {
         offsetX = 15;
@@ -66,7 +66,6 @@ public class DebugScene : Scene {
       }
       
     }
-    */
 
     /*
     var box = new Entity();
@@ -92,7 +91,8 @@ public class DebugScene : Scene {
 
     var fbx = new Entity();
     fbx.SetName("Yuna");
-    fbx.AddComponent(new Transform(new Vector3(2, 2, 2)));
+    fbx.AddComponent(new Transform(new Vector3(0, 0, 0)));
+    fbx.GetComponent<Transform>().Rotation = new Vector3(-90, 0, 0);
     fbx.AddComponent(new Material(new Vector3(1, 1, 1)));
     fbx.AddComponent(new FbxLoader().Load($"Resources/{fbx.GetName()}"));
     fbx.AddComponent(new MeshRenderer());

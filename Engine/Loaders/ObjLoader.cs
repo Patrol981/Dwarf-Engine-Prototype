@@ -15,15 +15,18 @@ public class ObjLoader : MeshLoader {
     _logger.Attach();
   }
 
+
   public override MasterMesh Load(string path) {
-    var scene = _assimpContext.ImportFile($"{path}.obj");
+    string[] pathElements = path.Split('/');
+    string filename = $"{path}/{pathElements[pathElements.Length - 1]}.obj";
+    var scene = _assimpContext.ImportFile(filename);
 
     _logger.Detach();
 
     List<DataStructures.Mesh> meshes = new();
 
     var node = scene.RootNode;
-
+    int x = 0;
     foreach (var child in node.Children) {
       foreach (int index in child.MeshIndices) {
         List<Vector3> posList = new();
@@ -67,73 +70,18 @@ public class ObjLoader : MeshLoader {
             normalList,
             indices,
             null!,
-            null!,
+            Textures.Texture.LoadFromFile($"{path}/{pathElements[pathElements.Length - 1]}.png"),
+            //Textures.Texture.LoadFromFile($"Resources/{pathElements[pathElements.Length-1]}/{x}.png"),
             aMesh.Name
         );
 
+        Console.WriteLine($"Resources/{pathElements[pathElements.Length - 1]}/{pathElements[pathElements.Length - 1]}.png");
+        x++;
         meshes.Add(mesh);
       }
     }
 
     MasterMesh masterMesh = new(meshes, Enums.MeshRenderType.FbxModel);
-    return masterMesh;
-  }
-
-  public MasterMesh OldLoad(string path) {
-    var scene = _assimpContext.ImportFile($"{path}.obj");
-
-    Console.WriteLine(scene.RootNode);
-
-    _logger.Detach();
-
-    Console.WriteLine(scene.MeshCount);
-
-    List<DataStructures.Mesh> meshes = new();
-
-    for (int i = 0; i < scene.MeshCount; i++) {
-      List<float> verts = new();
-      List<OpenTK.Mathematics.Vector3> normals = new();
-      List<OpenTK.Mathematics.Vector3> vec3Verts = new();
-      List<int> indices = new();
-      var aMesh = scene.Meshes[i];
-
-      indices = (aMesh.GetIndices().ToList());
-
-      for (int j = 0; j < aMesh.Vertices.Count; j++) {
-        verts.AddRange(new float[] {
-          aMesh.Vertices[j].X, aMesh.Vertices[j].Y, aMesh.Vertices[j].Z,
-          aMesh.Normals[j].X, aMesh.Normals[j].Y, aMesh.Normals[j].Z,
-          //aMesh.VertexColorChannels[i][indices[j]].R,
-          //aMesh.VertexColorChannels[i][indices[j]].G,
-          //aMesh.VertexColorChannels[0][indices[j]].B,
-          aMesh.TextureCoordinateChannels[i][indices[j]].X,
-          aMesh.TextureCoordinateChannels[i][indices[j]].Y,
-          //aMesh.TextureCoordinateChannels[i][indices[j]].Z,
-        });
-
-        vec3Verts.Add(new OpenTK.Mathematics.Vector3(
-          aMesh.Vertices[j].X, aMesh.Vertices[j].Y, aMesh.Vertices[j].Z)
-        );
-      }
-
-      for (int j = 0; j < aMesh.Normals.Count; j++) {
-        normals.Add(new OpenTK.Mathematics.Vector3(
-          aMesh.Normals[j].X, aMesh.Normals[j].Y, aMesh.Normals[j].Z)
-        );
-      }
-      /*
-      DataStructures.Mesh mesh = new(
-          vec3Verts,
-          normals,
-          verts,
-          indices
-        );
-      */
-
-      //meshes.Add(mesh);
-    }
-
-    MasterMesh masterMesh = new(meshes, Enums.MeshRenderType.WavefrontObjFile);
     return masterMesh;
   }
 
