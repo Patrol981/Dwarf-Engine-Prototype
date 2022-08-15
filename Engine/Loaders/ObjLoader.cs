@@ -30,12 +30,15 @@ public class ObjLoader : MeshLoader {
         List<Color4> colorList = new();
         List<Vector3> texList = new();
         List<Vector3> normalList = new();
+        List<int> indices = new();
 
         var aMesh = scene.Meshes[index];
 
         foreach (Face face in aMesh.Faces) {
           for (int i = 0; i < face.IndexCount; i++) {
             int indice = face.Indices[i];
+
+            indices.Add(indice);
 
             bool hasColors = aMesh.HasVertexColors(0);
             bool hasTexCoords = aMesh.HasTextureCoords(0);
@@ -62,8 +65,10 @@ public class ObjLoader : MeshLoader {
             colorList,
             texList,
             normalList,
-            null!
-            //Textures.Texture.LoadFromFile("Resources/grass.png")
+            indices,
+            null!,
+            null!,
+            aMesh.Name
         );
 
         meshes.Add(mesh);

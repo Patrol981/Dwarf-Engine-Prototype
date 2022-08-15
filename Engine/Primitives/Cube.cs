@@ -74,7 +74,10 @@ public class Cube {
   }
 
   public Cube(bool withTexture = true) {
-    _shader = new Shader("Shaders/cube.vert", "Shaders/cube.frag");
+    _shader = new Shader(
+      "G:\\repos\\priv\\OpenTK\\Dwarf Engine\\Shaders\\cube.vert",
+      "G:\\repos\\priv\\OpenTK\\Dwarf Engine\\Shaders\\cube.frag"
+      );
 
     _withTexture = withTexture;
 
@@ -99,7 +102,7 @@ public class Cube {
     GL.EnableVertexAttribArray(1);
     GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, 5 * sizeof(float), 3 * sizeof(float));
 
-    _texture = Texture.FastTextureLoad("Resources/grass.png");
+    _texture = Texture.FastTextureLoad("G:\\repos\\priv\\OpenTK\\Dwarf Engine\\Resources\\grass.png");
     Console.WriteLine(_texture.Handle);
     _texture.Use(TextureUnit.Texture0);
   }

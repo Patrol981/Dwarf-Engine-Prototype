@@ -2,7 +2,7 @@ using OpenTK.Mathematics;
 
 namespace Dwarf.Engine.ECS;
 
-class Transform : Component {
+public class Transform : Component {
   public Vector3 Position;
   public Vector3 Rotation;
 

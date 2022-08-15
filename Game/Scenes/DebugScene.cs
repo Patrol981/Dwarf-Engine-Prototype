@@ -1,6 +1,8 @@
 using Dwarf.Engine.Cameras;
+using Dwarf.Engine.Controllers;
 using Dwarf.Engine.DataStructures;
 using Dwarf.Engine.ECS;
+using Dwarf.Engine.Generators;
 using Dwarf.Engine.Globals;
 using Dwarf.Engine.Loaders;
 using OpenTK.Mathematics;
@@ -9,9 +11,6 @@ namespace Dwarf.Engine.Scenes;
 
 public class DebugScene : Scene {
   public DebugScene() : base() {
-    // TODO : Marching cubes
-    // TODO : Procedural Mesh Generation
-
     var window = WindowGlobalState.GetWindow();
 
     var camera = new Entity();
@@ -20,7 +19,11 @@ public class DebugScene : Scene {
     CameraGlobalState.SetCameraEntity(camera);
     CameraGlobalState.SetCamera(camera.GetComponent<FreeCamera>());
 
-    /*
+    // TODO : Marching cubes
+    // TODO : Procedural Mesh Generation
+
+    // var window = WindowGlobalState.GetWindow();
+
     var terrain = new Entity();
     terrain.AddComponent(new Transform(new Vector3(0, 0, 0)));
     terrain.AddComponent(new Material(new Vector3(1.0f, 1.0f, 1.0f)));
@@ -30,7 +33,6 @@ public class DebugScene : Scene {
     terrain.GetComponent<MeshRenderer>().Init("./Shaders/terrain.vert", "./Shaders/terrain.frag");
     terrain.SetName("new terrain");
     Entities.Add(terrain);
-    */
 
     /*
     var objTest = new Entity();
@@ -89,13 +91,14 @@ public class DebugScene : Scene {
     */
 
     var fbx = new Entity();
-    fbx.SetName("fbx");
-    fbx.AddComponent(new Transform(new Vector3(2, 0, 0)));
+    fbx.SetName("Yuna");
+    fbx.AddComponent(new Transform(new Vector3(2, 2, 2)));
     fbx.AddComponent(new Material(new Vector3(1, 1, 1)));
-    fbx.AddComponent(new FbxLoader().Load("Resources/Yuna"));
+    fbx.AddComponent(new FbxLoader().Load($"Resources/{fbx.GetName()}"));
     fbx.AddComponent(new MeshRenderer());
     //fbx.GetComponent<MeshRenderer>().Init("./Shaders/cubeComponent.vert", "./Shaders/cubeComponent.frag");
     fbx.GetComponent<MeshRenderer>().Init("./Shaders/vertexShader.vert", "./Shaders/fragmentShader.frag");
+    fbx.AddComponent(new TransformController(1.5f));
     Entities.Add(fbx);
 
     /*
@@ -114,7 +117,7 @@ public class DebugScene : Scene {
     backpack.SetName("backpack");
     backpack.AddComponent(new Transform(new Vector3(4, 0, 0)));
     backpack.AddComponent(new Material(new Vector3(1, 0.5f, 0.3f)));
-    backpack.AddComponent(new GenericLoader().Load("Resources/backpack.obj"));
+    backpack.AddComponent(new ObjLoader().Load("Resources/backpack"));
     backpack.AddComponent(new MeshRenderer());
     backpack.GetComponent<MeshRenderer>().Init("./Shaders/vertexShader.vert", "./Shaders/fragmentShader.frag");
     Entities.Add(backpack);
@@ -124,7 +127,7 @@ public class DebugScene : Scene {
     EntityGlobalState.SetEntities(Entities);
   }
 
-  internal override void RenderScene() {
+  public override void RenderScene() {
     throw new NotImplementedException();
   }
 }

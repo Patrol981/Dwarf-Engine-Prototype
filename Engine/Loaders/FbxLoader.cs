@@ -17,15 +17,17 @@ public class FbxLoader : MeshLoader {
 
 
   public override MasterMesh Load(string path) {
-    var scene = _assimpContext.ImportFile($"{path}.fbx");
-
+    string[] pathElements = path.Split('/');
+    string filename = $"{path}/{pathElements[pathElements.Length - 1]}.fbx";
+    var scene = _assimpContext.ImportFile(filename);
+    
     _logger.Detach();
 
     List<DataStructures.Mesh> meshes = new();
 
     var node = scene.RootNode;
-
-    foreach(var child in node.Children) {
+    int x = 0;
+    foreach (var child in node.Children) {
       foreach (int index in child.MeshIndices) {
         List<Vector3> posList = new();
         List<Color4> colorList = new();
@@ -68,10 +70,13 @@ public class FbxLoader : MeshLoader {
             normalList,
             indices,
             null!,
-            Textures.Texture.FastTextureLoad("Resources/grass.png"),
+            Textures.Texture.LoadFromFile($"{path}/{x}.png"),
+            //Textures.Texture.LoadFromFile($"Resources/{pathElements[pathElements.Length-1]}/{x}.png"),
             aMesh.Name
         );
 
+        Console.WriteLine($"Resources/{pathElements[pathElements.Length - 1]}/{x}.png");
+        x++;
         meshes.Add(mesh);
       }
     }

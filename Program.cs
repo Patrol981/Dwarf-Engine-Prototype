@@ -7,6 +7,7 @@ using Dwarf.Engine.Windowing;
 using Dwarf.Engine.Globals;
 using Dwarf.Callbacks;
 using Dwarf.Engine;
+using Dwarf.Engine.Scenes;
 
 class Program {
   unsafe static void Main() {

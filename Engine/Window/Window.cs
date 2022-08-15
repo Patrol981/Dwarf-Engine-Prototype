@@ -77,11 +77,11 @@ public class Window : GameWindow {
 
     Clear();
     //GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-    //_controller.Render();
     _onRender?.Invoke();
 
     _controller.Update(this, (float)args.Time);
     _onDrawGUI?.Invoke();
+    _controller.Render();
 
     GLFW.SwapBuffers(this.WindowPtr);
   }

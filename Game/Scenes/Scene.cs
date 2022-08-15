@@ -11,5 +11,5 @@ public abstract class Scene {
     Entities = new List<Entity>();
   }
 
-  internal abstract void RenderScene();
+  public abstract void RenderScene();
 }

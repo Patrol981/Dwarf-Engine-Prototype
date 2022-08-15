@@ -9,32 +9,37 @@ using Dwarf.Engine.Info;
 using Dwarf.Engine.Skyboxes;
 using Dwarf.Engine.Scenes;
 using Dwarf.Engine.Primitives;
+using Dwarf.Engine.Controllers;
 
 namespace Dwarf.Engine;
 
 public class EngineClass {
   private Windowing.Window _window;
-  private Scene _scene;
+  public Scene Scene;
   private FPS _fps;
   private Skybox _skybox;
   private Cube? _cube;
 
-  public EngineClass() {
-    _window = new Dwarf.Engine.Windowing.Window(GameWindowSettings.Default, WindowSettings.GetNativeWindowSettings());
-    WindowGlobalState.SetWindow(_window);
+  public EngineClass(Windowing.Window window = null!) {
+    if(window == null) {
+      _window = new Dwarf.Engine.Windowing.Window(GameWindowSettings.Default, WindowSettings.GetNativeWindowSettings());
+      WindowGlobalState.SetWindow(_window);
+    } else {
+      _window = window;
+    }
 
     _window.BindUpdateCallback(OnUpdate);
     _window.BindRenderCallback(OnRender);
     _window.BindResizeCallback(OnResize);
     _window.BindDrawGUICallback(OnDrawGUI);
 
-    _scene = new DebugScene();
+    Scene = new DebugScene();
 
     _fps = new FPS();
 
     _skybox = new Skybox(_window.Size.X / (float)_window.Size.Y);
 
-    _cube = new Cube(false);
+    //_cube = new Cube(false);
 
   }
 
@@ -42,8 +47,18 @@ public class EngineClass {
     _window.Run();
   }
 
+  public void Setup() {
+
+  }
+
   public void OnUpdate() {
     _fps.Update();
+
+    for(int i=0; i<Scene.Entities.Count; i++) {
+      if(Scene.Entities[i].GetComponent<TransformController>() != null) {
+        Scene.Entities[i].GetComponent<TransformController>().HandleMovement();
+      }
+    }
   }
 
   public void OnRender() {
@@ -53,11 +68,13 @@ public class EngineClass {
 
     _skybox.Update((Camera)camera);
     // MouseSelect();
-    for (int i = 0; i < _scene.Entities.Count; i++) {
-    _scene.Entities[i].GetComponent<MeshRenderer>().Render((Camera)camera);
+    //var entities = EntityGlobalState.GetEntities();
+    for (int i = 0; i < Scene.Entities.Count; i++) {
+      Scene.Entities[i].GetComponent<MeshRenderer>().Render((Camera)camera);
+      //entities[i].GetComponent<MeshRenderer>().Render((Camera)camera);
     }
 
-    _cube!.Redner((Camera)camera);
+    //_cube!.Redner((Camera)camera);
   }
 
   public void OnResize() {
@@ -69,17 +86,16 @@ public class EngineClass {
     if (ImGui.BeginMainMenuBar()) {
       ImGui.Text($"FPS: {FPSState.GetFrames()}");
 
-      /*
       if (ImGui.BeginMenu("Debug Data")) {
         var entities = EntityGlobalState.GetEntities();
         for (int i = 0; i < entities.Count; i++) {
           ImGui.PushID(entities[i].GetName());
           if (ImGui.TreeNodeEx(entities[i].GetName())) {
             ImGui.Text($"Model {i} name: {entities[i].GetName()}");
-            // ImGui.Text($"Meshes: {entities[i].GetComponent<MasterMesh>().Meshes.Count}");
-            //for(int x=0; x< entities[i].GetComponent<MasterMesh>().Meshes.Count; x++) {
-            //  ImGui.Text($"Indices {x}: {entities[i].GetComponent<MasterMesh>().Meshes[x].Indices.Count}");
-            //}
+            ImGui.Text($"Meshes: {entities[i].GetComponent<MasterMesh>().Meshes.Count}");
+            for(int x=0; x< entities[i].GetComponent<MasterMesh>().Meshes.Count; x++) {
+              ImGui.Text(entities[i].GetComponent<MasterMesh>().Meshes[x].Name);
+            }
             var color = entities[i].GetComponent<Material>().GetColor();
             var pos = entities[i].GetComponent<Transform>();
             var cnvVec = new System.Numerics.Vector3(color.X, color.Y, color.Z);
@@ -94,7 +110,6 @@ public class EngineClass {
           }
         }
       }
-      */
 
 
     }
@@ -111,6 +126,10 @@ public class EngineClass {
       ImGui.Text($"X:{targetTransform.Position.X} Y:{targetTransform.Position.Y} Z:{targetTransform.Position.Z}");
     }
     */
+  }
+
+  public void AddToScene(Entity entity) {
+    Scene.Entities.Add(entity);
   }
 }
 

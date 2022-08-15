@@ -1,11 +1,9 @@
 ﻿#version 330 core
 
 layout(location = 0) in vec3 aPosition;
-layout(location = 1) in vec3 aNormal;
+layout(location = 1) in vec2 aTexCoord;
+layout(location = 2) in vec3 aNormal;
 // layout(location = 3) in vec4 aColor;
-
-out vec3 vFragPos;
-out vec3 vNormal;
 
 //flat out vec3 pass_colour;//The "flat" qualifier stops the colour from being interpolated over the triangles.
 
@@ -15,9 +13,13 @@ out vec3 vNormal;
 
 // uniform mat4 projectionViewMatrix;
 
+out vec2 texCoord;
+out vec3 vNormal;
+out vec3 vFragPos;
+
 uniform mat4 uModel;
-uniform mat4 uProjection;
 uniform mat4 uView;
+uniform mat4 uProjection;
 
 //simple diffuse lighting
 //vec3 calculateLighting() {
@@ -27,8 +29,10 @@ uniform mat4 uView;
 //}
 
 void main(void) {
-	vFragPos = vec3(uModel * vec4(aPosition, 1.0));
+	texCoord = aTexCoord;
     vNormal = mat3(transpose(inverse(uModel))) * aNormal;
+    vFragPos = vec3(uModel * vec4(aPosition, 1.0));
+
     gl_Position = vec4(aPosition, 1.0) * uModel * uView * uProjection;
 	//gl_Position = projectionViewMatrix * vec4(in_position, 1.0);
 	

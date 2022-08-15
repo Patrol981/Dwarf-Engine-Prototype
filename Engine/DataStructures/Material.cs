@@ -2,7 +2,7 @@ using OpenTK.Mathematics;
 
 namespace Dwarf.Engine.ECS;
 
-class Material : Component {
+public class Material : Component {
   private Vector3 _color;
 
   public Material(Vector3 color) {
