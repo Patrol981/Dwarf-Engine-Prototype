@@ -16,7 +16,7 @@ public class FbxLoader : MeshLoader {
   }
 
 
-  public override MasterMesh Load(string path) {
+  public override MasterMesh Load(string path, bool useTextures = true) {
     string[] pathElements = path.Split('/');
     string filename = $"{path}/{pathElements[pathElements.Length - 1]}.fbx";
     var scene = _assimpContext.ImportFile(filename);
@@ -70,12 +70,10 @@ public class FbxLoader : MeshLoader {
             normalList,
             indices,
             null!,
-            Textures.Texture.LoadFromFile($"{path}/{x}.png"),
+            useTextures == true ? Textures.Texture.LoadFromFile($"{path}/{x}.png") : null!,
             //Textures.Texture.LoadFromFile($"Resources/{pathElements[pathElements.Length-1]}/{x}.png"),
             aMesh.Name
         );
-
-        Console.WriteLine($"Resources/{pathElements[pathElements.Length - 1]}/{x}.png");
         x++;
         meshes.Add(mesh);
       }

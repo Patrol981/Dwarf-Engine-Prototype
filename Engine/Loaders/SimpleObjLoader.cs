@@ -11,7 +11,7 @@ public class SimpleObjLoader : MeshLoader {
   private List<int>? _vertIndices, _normalIndices, _textureIndices;
   private List<Vector2>? _textures;
 
-  public override MasterMesh Load(string path) {
+  public override MasterMesh Load(string path, bool useTextures = true) {
     _vertices = new();
     _normals = new();
     _vertIndices = new();

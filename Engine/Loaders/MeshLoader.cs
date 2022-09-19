@@ -4,7 +4,7 @@ using Dwarf.Engine.DataStructures;
 namespace Dwarf.Engine.Loaders;
 
 public abstract class MeshLoader {
-  public virtual MasterMesh Load(string path) {
+  public virtual MasterMesh Load(string path, bool useTextures) {
     return null!;
   }
 

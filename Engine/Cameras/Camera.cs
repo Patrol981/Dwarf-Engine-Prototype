@@ -17,8 +17,6 @@ namespace Dwarf.Engine.Cameras;
   internal float _yaw = -MathHelper.PiOver2; // Without this, you would be started rotated 90 degrees right.
   internal float _fov = MathHelper.PiOver2;
 
-  public Vector3 Position { get; set; }
-
   public float AspectRatio { internal get; set; }
 
   public Vector3 Front => _front;
@@ -26,8 +24,7 @@ namespace Dwarf.Engine.Cameras;
   public Vector3 Right => _right;
   public Vector3 WorldUp = new Vector3(0f, 1f, 0f);
 
-  public Camera(Vector3 position, float aspectRatio) {
-    // Position = position;
+  public Camera(float aspectRatio) {
     AspectRatio = aspectRatio;
   }
 

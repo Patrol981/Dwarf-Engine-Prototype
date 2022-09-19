@@ -10,15 +10,39 @@ using Dwarf.Engine.Skyboxes;
 using Dwarf.Engine.Scenes;
 using Dwarf.Engine.Primitives;
 using Dwarf.Engine.Controllers;
+using Dwarf.Engine.Raycasting;
+using Dwarf.Engine.Physics;
 
 namespace Dwarf.Engine;
 
 public class EngineClass {
-  private Windowing.Window _window;
+  // User API
+  public delegate void EventCallback();
+
+  public void SetUpdateCallback(EventCallback eventCallback) {
+    _onUpdate = eventCallback;
+  }
+
+  public void SetRenderCallback(EventCallback eventCallback) {
+    _onRender = eventCallback;
+  }
+
+  public void SetGUICallback(EventCallback eventCallback) {
+    _onGUI = eventCallback;
+  }
+  
   public Scene Scene;
+
+  // Engine Data
+  private Windowing.Window _window;
   private FPS _fps;
   private Skybox _skybox;
-  private Cube? _cube;
+  private Raycaster _raycaster;
+  private Physics.Physics _physics;
+
+  private EventCallback? _onUpdate;
+  private EventCallback? _onRender;
+  private EventCallback? _onGUI;
 
   public EngineClass(Windowing.Window window = null!) {
     if(window == null) {
@@ -35,11 +59,13 @@ public class EngineClass {
 
     Scene = new DebugScene();
 
+    //_physics = new Physics.Physics();
+
     _fps = new FPS();
 
     _skybox = new Skybox(_window.Size.X / (float)_window.Size.Y);
 
-    //_cube = new Cube(false);
+    _raycaster = new((Camera)CameraGlobalState.GetCamera());
 
   }
 
@@ -47,11 +73,7 @@ public class EngineClass {
     _window.Run();
   }
 
-  public void Setup() {
-
-  }
-
-  public void OnUpdate() {
+  protected void OnUpdate() {
     _fps.Update();
 
     for(int i=0; i<Scene.Entities.Count; i++) {
@@ -59,30 +81,32 @@ public class EngineClass {
         Scene.Entities[i].GetComponent<TransformController>().HandleMovement();
       }
     }
+
+    _onUpdate?.Invoke();
   }
 
-  public void OnRender() {
-    // var camera = CameraGlobalState.GetCameraEntity().GetComponent<FreeCamera>();
+  protected void OnRender() {
     var camera = (ICamera)CameraGlobalState.GetCamera();
     camera.HandleMovement();
 
     _skybox.Update((Camera)camera);
-    // MouseSelect();
-    //var entities = EntityGlobalState.GetEntities();
+    
     for (int i = 0; i < Scene.Entities.Count; i++) {
       Scene.Entities[i].GetComponent<MeshRenderer>().Render((Camera)camera);
-      //entities[i].GetComponent<MeshRenderer>().Render((Camera)camera);
+      if (Scene.Entities[i].GetComponent<BoundingBox>() != null) {
+        Scene.Entities[i].GetComponent<BoundingBox>().Draw((Camera)camera);
+      }
     }
 
-    //_cube!.Redner((Camera)camera);
+    _onRender?.Invoke();
   }
 
-  public void OnResize() {
+  protected void OnResize() {
     CameraGlobalState.GetCamera().AspectRatio =
       _window.Size.X / (float)_window.Size.Y;
   }
 
-  public void OnDrawGUI() {
+  protected void OnDrawGUI() {
     if (ImGui.BeginMainMenuBar()) {
       ImGui.Text($"FPS: {FPSState.GetFrames()}");
 
@@ -107,67 +131,71 @@ public class EngineClass {
             entities[i].GetComponent<Transform>().Position = new Vector3(cnvPos.X, cnvPos.Y, cnvPos.Z);
             ImGui.DragFloat3("Rotation", ref cnvRot, 0.01f);
             entities[i].GetComponent<Transform>().Rotation = new Vector3(cnvRot.X, cnvRot.Y, cnvRot.Z);
+            if(ImGui.Button("Switch Controller")) {
+              for(int x=0; x<Scene.Entities.Count; x++) {
+                var target = Scene.Entities[x];
+                if(target.GetComponent<TransformController>() != null) {
+                  target.RemoveComponent<TransformController>();
+                  break;
+                }
+              }
+              CameraGlobalState.GetCameraEntity().GetComponent<ThirdPersonCamera>().FollowTarget = entities[i];
+              entities[i].AddComponent(new TransformController(1.5f));
+              WindowGlobalState.SetCursorVisible(false);
+            }
           }
         }
       }
-
-
     }
 
-    /*
     if (ImGui.Begin("Camera Test")) {
       if (EntityGlobalState.GetEntities().Count == 0) return;
-      var targetTransform = EntityGlobalState.GetEntities()[0].GetComponent<Transform>();
       var cameraTransform = CameraGlobalState.GetCameraEntity().GetComponent<Transform>();
+      var camera = CameraGlobalState.GetCameraEntity().GetComponent<ThirdPersonCamera>();
 
       ImGui.Text("Camera");
       ImGui.Text($"X:{cameraTransform.Position.X} Y:{cameraTransform.Position.Y} Z:{cameraTransform.Position.Z}");
+      ImGui.Text($"X:{cameraTransform.Rotation.X} Y:{cameraTransform.Rotation.Y} Z:{cameraTransform.Rotation.Z}");
+
+      /*
+      var camTarget = CameraGlobalState.GetCameraEntity().GetComponent<ThirdPersonCamera>().FollowTarget.GetComponent<Transform>();
+
+      ImGui.Text($"Front: {camera.Front}");
+      ImGui.Text($"Yaw: {camera.Yaw}");
+      ImGui.Text($"Pitch: {camera.Pitch}");
+      ImGui.Text($"Distance: {camera.ScrollDistance}");
+      ImGui.Text($"Angle: {camera.Angle}");
+      
+
       ImGui.Text("Target");
-      ImGui.Text($"X:{targetTransform.Position.X} Y:{targetTransform.Position.Y} Z:{targetTransform.Position.Z}");
+      ImGui.Text($"X:{camTarget.Position.X} Y:{camTarget.Position.Y} Z:{camTarget.Position.Z}");
+      ImGui.Text($"X:{camTarget.Rotation.X} Y:{camTarget.Rotation.Y} Z:{camTarget.Rotation.Z}");
+      */
     }
-    */
+
+    if(ImGui.Begin("Boundings")) {
+      var target = Scene.Entities[0];
+
+      ImGui.Text($"Target: {target.GetName()}");
+
+      ImGui.Text($"Meshes: {target.GetComponent<MasterMesh>().Meshes.Count}");
+
+      ImGui.Text("Size");
+      ImGui.Text(target.GetComponent<BoundingBox>().Size.ToString());
+      ImGui.Text("Center");
+      ImGui.Text(target.GetComponent<BoundingBox>().Center.ToString());
+      ImGui.Text("Transfrom");
+      ImGui.Text(target.GetComponent<BoundingBox>().Tranform.ToString());
+      ImGui.Text("Model");
+      ImGui.Text(target.GetComponent<BoundingBox>().Model.ToString());
+      ImGui.Text("WorldModel");
+      ImGui.Text(target.GetComponent<BoundingBox>().WorldModel.ToString());
+    }
+
+    _onGUI?.Invoke();
   }
 
   public void AddToScene(Entity entity) {
     Scene.Entities.Add(entity);
   }
 }
-
-  /*
-  private void MouseSelect() {
-    if(WindowGlobalState.GetMouseState().IsButtonDown(MouseButton.Left)) {
-      _window.Clear(new Vector3(0,0,0));
-
-      for(int i=0; i<_scene.Entities.Count; i++) {
-        Vector3 color = _scene.Entities[i].GetComponent<Material>().GetColor();
-        int id = i+1;
-
-        _scene.Entities[i].GetComponent<Material>().SetColor(new Vector3((float) id / 255, 0, 0));
-        _scene.Entities[i].GetComponent<MeshRenderer>().GetShader().Use();
-        _scene.Entities[i].GetComponent<MeshRenderer>().GetShader().SetInt("val", 0);
-
-        _scene.Entities[i].GetComponent<MeshRenderer>().Render(CameraGlobalState.GetCameraEntity().GetComponent<FreeCamera>());
-
-        _scene.Entities[i].GetComponent<MeshRenderer>().GetShader().SetInt("val", 1);
-        _scene.Entities[i].GetComponent<Material>().SetColor(color);
-      }
-
-      byte[] pixels = new byte[4];
-      var currPos = WindowGlobalState.GetMouseState();
-
-
-      // GL.ReadPixels((int)(currPos.X - _window.ClientSize.X), (int)(_window.Size.Y - (currPos.Y - _window.ClientSize.Y)), 1, 1, PixelFormat.Rgba, PixelType.UnsignedByte, pixels);
-      GL.ReadPixels((int)(currPos.X - _window.Size.X), (int)(_window.Bounds.Max.Y - (currPos.Y - _window.Size.Y)), 1, 1, PixelFormat.Rgba,
-                    PixelType.UnsignedByte, pixels);
-      int index = pixels[0] - 1;
-
-      if(index != -1) {
-        Console.WriteLine($"Selected {index}");
-      } else {
-        Console.WriteLine(index);
-      }
-
-      _window.Clear();
-    }
-  }
-  */

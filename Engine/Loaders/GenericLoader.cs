@@ -18,7 +18,7 @@ public class GenericLoader : MeshLoader {
     _logger.Attach();
   }
 
-  public override MasterMesh Load(string path) {
+  public override MasterMesh Load(string path, bool useTextures = true) {
     var scene = _assimpContext.ImportFile($"{path}", PostProcessSteps.Triangulate | PostProcessSteps.GenerateSmoothNormals | PostProcessSteps.FlipUVs | PostProcessSteps.CalculateTangentSpace);
 
     var node = scene.RootNode;

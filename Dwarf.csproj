@@ -44,4 +44,10 @@
     <Folder Include="Engine\DataStructures\ECS\Mesh\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="BulletSharp">
+      <HintPath>..\BulletSharpPInvoke-master\BulletSharp\bin\Release\netstandard2.1\BulletSharp.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>

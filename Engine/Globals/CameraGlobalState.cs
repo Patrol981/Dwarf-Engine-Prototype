@@ -46,7 +46,7 @@ public static class CameraGlobalState {
 
   public static Camera GetCamera() {
     if(_camera == null) {
-      _camera = new FreeCamera(Vector3.Zero, float.NaN);
+      _camera = new FreeCamera(float.NaN);
     }
     return _camera;
   }

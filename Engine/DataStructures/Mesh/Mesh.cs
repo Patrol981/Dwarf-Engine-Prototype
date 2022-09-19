@@ -20,12 +20,20 @@ public class Mesh : Component {
   private Shader? _shader;
 
   public Mesh(
-    List<Vertex> veritces,
+    List<Vertex> vertexArray,
     List<int> indices,
     List<TextureStruct> textures
   ) {
-    _vertexArray = veritces;
+    _vertexArray = vertexArray;
     _textureArray = textures;
+    _indices = indices;
+  }
+
+  public Mesh(
+    List<Vertex> vertexArray,
+    List<int> indices
+  ) {
+    _vertexArray = vertexArray;
     _indices = indices;
   }
 

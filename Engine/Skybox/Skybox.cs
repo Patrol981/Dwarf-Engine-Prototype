@@ -76,20 +76,20 @@ public class Skybox {
   public Skybox(float ratio) {
     const string BasePath = "G:\\repos\\priv\\OpenTK\\Dwarf Engine";
 
-    _shader = new Shader($"{BasePath}\\Shaders\\skybox.vert", $"{BasePath}\\Shaders\\skybox.frag");
+    _shader = new Shader($"Shaders\\skybox.vert", $"Shaders\\skybox.frag");
     _ratio = ratio;
 
     
 
     List<string> faces = new List<string>();
-    faces.Add($"{BasePath}\\Resources/Skyboxes/Sunny/left.jpg");
-    faces.Add($"{BasePath}\\Resources/Skyboxes/Sunny/bottom.jpg");
+    faces.Add($"Resources/Skyboxes/Sunny/left.jpg");
+    faces.Add($"Resources/Skyboxes/Sunny/bottom.jpg");
     
-    faces.Add($"{BasePath}\\Resources/Skyboxes/Sunny/back.jpg");
-    faces.Add($"{BasePath}\\Resources/Skyboxes/Sunny/right.jpg");
+    faces.Add($"Resources/Skyboxes/Sunny/back.jpg");
+    faces.Add($"Resources/Skyboxes/Sunny/right.jpg");
 
-    faces.Add($"{BasePath}\\Resources/Skyboxes/Sunny/top.jpg");
-    faces.Add($"{BasePath}\\Resources/Skyboxes/Sunny/front.jpg");
+    faces.Add($"Resources/Skyboxes/Sunny/top.jpg");
+    faces.Add($"Resources/Skyboxes/Sunny/front.jpg");
 
     _vao = GL.GenVertexArray();
     _vbo = GL.GenBuffer();

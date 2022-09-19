@@ -15,11 +15,25 @@ public class MeshRenderer : Component {
 
   private Shader? _shader;
   private Matrix4 _model;
+  private Matrix4 _worldModel;
   // private int _vbo, _vao, _ebo;
   private List<int> _vbo = new(), _vao = new(), _ebo = new();
 
   public MeshRenderer() {
   }
+
+  public Matrix4 Model {
+    get { return _model; }
+  }
+
+  public Shader Shader {
+    get { return _shader; }
+  }
+
+  public Matrix4 WorldModel {
+    get { return _worldModel; }
+  }
+
   public MeshRenderer Init(string vs, string fs) {
     MasterMesh masterMesh = Owner!.GetComponent<MasterMesh>();
     if (masterMesh == null) {
@@ -27,6 +41,7 @@ public class MeshRenderer : Component {
     }
 
     _model = Matrix4.Identity;
+    _worldModel = Matrix4.Identity;
     _shader = new Shader(vs, fs);
 
     for (int i = 0; i < masterMesh.Meshes.Count; i++) {
@@ -45,6 +60,7 @@ public class MeshRenderer : Component {
         masterMesh.Meshes[i].VertexArray.ToArray(),
         BufferUsageHint.StaticDraw
       );
+      
 
       if (masterMesh.Meshes[i].Indices != null && masterMesh.Meshes[i].Indices.Count > 0) {
         _ebo[i] = GL.GenBuffer();
@@ -57,11 +73,12 @@ public class MeshRenderer : Component {
           BufferUsageHint.StaticDraw
         );
       }
+      
       //Textures.Texture.LoadFromFile($"Resources/{masterMesh!.Owner!.GetName()}/{i}.png")
       //_textures.Add(masterMesh.Meshes[i].Texture);
       //_textures[i].Use(Textures.ETextureUnit.Texture0);
       //_textures[i].Use((TextureUnit)Enum.Parse(typeof(TextureUnit), $"Texture0"));
-      if(masterMesh.Meshes[i].Texture != null) {
+      if (masterMesh.Meshes[i].Texture != null) {
         masterMesh.Meshes[i].Texture.Use((TextureUnit)Enum.Parse(typeof(TextureUnit), $"Texture0"));
       }
       
@@ -87,6 +104,14 @@ public class MeshRenderer : Component {
       GL.EnableVertexAttribArray(4);
       GL.VertexAttribPointer(4, 3, VertexAttribPointerType.Float, false, Unsafe.SizeOf<Vertex>(), Marshal.OffsetOf<Vertex>("Bitangent"));
 
+      // joints
+      GL.EnableVertexAttribArray(5);
+      GL.VertexAttribPointer(5, 3, VertexAttribPointerType.Int, false, Unsafe.SizeOf<Vertex>(), Marshal.OffsetOf<Vertex>("JointIds"));
+
+      // weights
+      GL.EnableVertexAttribArray(6);
+      GL.VertexAttribPointer(6, 3, VertexAttribPointerType.Float, false, Unsafe.SizeOf<Vertex>(), Marshal.OffsetOf<Vertex>("Weights"));
+
       _shader.SetInt("texture0", 0);
     }
     return this;
@@ -103,7 +128,7 @@ public class MeshRenderer : Component {
     _shader.SetVector3("aPosition", camera.Owner!.GetComponent<Transform>().Position);
 
     Material material = Owner!.GetComponent<Material>();
-    _shader.SetVector3("uDiffuse", material?.GetColor() ?? new Vector3(1, 0.5f, 0.3f));
+    _shader.SetVector3("uDiffuse", material?.GetColor() ?? new Vector3(1, 1f, 1f));
 
     Matrix4 projection = camera.GetProjectionMatrix();
     Matrix4 view = camera.GetViewMatrix();
@@ -117,9 +142,9 @@ public class MeshRenderer : Component {
 
     _model = Matrix4.CreateRotationX(angleX) * Matrix4.CreateRotationY(angleY) * Matrix4.CreateRotationZ(angleZ);
 
-    Matrix4 worldModel = _model * Matrix4.CreateTranslation(modelPos);
+    _worldModel = _model * Matrix4.CreateTranslation(modelPos);
 
-    _shader.SetMatrix4("uModel", worldModel);
+    _shader.SetMatrix4("uModel", _worldModel);
 
     for(int i = 0; i < masterMesh.Meshes.Count; i++) {
 

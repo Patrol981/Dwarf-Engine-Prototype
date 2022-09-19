@@ -12,13 +12,11 @@ using Dwarf.Engine.ECS;
 namespace Dwarf.Engine.Cameras;
 
 public class FreeCamera : Camera, ICamera {
-  public FreeCamera(Vector3 postion, float aspectRatio) : base(postion, aspectRatio) {}
+  public FreeCamera(float aspectRatio) : base(aspectRatio) {}
 
   public FreeCamera() {}
 
   public void HandleMovement() {
-    var camera = CameraGlobalState.GetCameraEntity().GetComponent<FreeCamera>();
-    var cameraEntity = CameraGlobalState.GetCameraEntity();
     if(CameraGlobalState.GetFirstMove()) {
       CameraGlobalState.SetFirstMove(false);
       CameraGlobalState.SetLastPosition(new Vector2(WindowGlobalState.GetMouseState().Position.X, WindowGlobalState.GetMouseState().Position.Y));
@@ -28,30 +26,30 @@ public class FreeCamera : Camera, ICamera {
       CameraGlobalState.SetLastPosition(new Vector2(WindowGlobalState.GetMouseState().Position.X, WindowGlobalState.GetMouseState().Position.Y));
       
       if(!WindowGlobalState.GetCursorVisible()) {
-        camera.Yaw += deltaX * CameraGlobalState.GetSensitivity();
-        camera.Pitch -= deltaY * CameraGlobalState.GetSensitivity();
+        Yaw += deltaX * CameraGlobalState.GetSensitivity();
+        Pitch -= deltaY * CameraGlobalState.GetSensitivity();
       }
       
     }
 
     if(WindowGlobalState.GetKeyboardState().IsKeyDown(Keys.W)) {
-      cameraEntity.GetComponent<Transform>().Position += camera.Front * CameraGlobalState.GetCameraSpeed() * (float)WindowGlobalState.GetTime();
+      Owner!.GetComponent<Transform>().Position += Front * CameraGlobalState.GetCameraSpeed() * (float)WindowGlobalState.GetTime();
     }
     if(WindowGlobalState.GetKeyboardState().IsKeyDown(Keys.S)) {
-      cameraEntity.GetComponent<Transform>().Position -= camera.Front * CameraGlobalState.GetCameraSpeed() * (float)WindowGlobalState.GetTime();
+      Owner!.GetComponent<Transform>().Position -= Front * CameraGlobalState.GetCameraSpeed() * (float)WindowGlobalState.GetTime();
     }
     if(WindowGlobalState.GetKeyboardState().IsKeyDown(Keys.A)) {
-      cameraEntity.GetComponent<Transform>().Position -= camera.Right * CameraGlobalState.GetCameraSpeed() * (float)WindowGlobalState.GetTime();
+      Owner!.GetComponent<Transform>().Position -= Right * CameraGlobalState.GetCameraSpeed() * (float)WindowGlobalState.GetTime();
     }
     if(WindowGlobalState.GetKeyboardState().IsKeyDown(Keys.D)) {
-      cameraEntity.GetComponent<Transform>().Position += camera.Right * CameraGlobalState.GetCameraSpeed() * (float)WindowGlobalState.GetTime();
+      Owner!.GetComponent<Transform>().Position += Right * CameraGlobalState.GetCameraSpeed() * (float)WindowGlobalState.GetTime();
     }
 
     if(WindowGlobalState.GetKeyboardState().IsKeyDown(Keys.LeftShift)) {
-      cameraEntity.GetComponent<Transform>().Position += camera.WorldUp * CameraGlobalState.GetCameraSpeed() * (float)WindowGlobalState.GetTime();
+      Owner!.GetComponent<Transform>().Position += WorldUp * CameraGlobalState.GetCameraSpeed() * (float)WindowGlobalState.GetTime();
     }
     if(WindowGlobalState.GetKeyboardState().IsKeyDown(Keys.Space)) {
-      cameraEntity.GetComponent<Transform>().Position -= camera.WorldUp * CameraGlobalState.GetCameraSpeed() * (float)WindowGlobalState.GetTime();
+      Owner!.GetComponent<Transform>().Position -= WorldUp * CameraGlobalState.GetCameraSpeed() * (float)WindowGlobalState.GetTime();
     }
 
     if(WindowGlobalState.GetKeyboardState().IsKeyPressed(Keys.Tab)) {

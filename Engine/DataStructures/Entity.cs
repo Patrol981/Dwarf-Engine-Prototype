@@ -19,6 +19,10 @@ public class Entity {
     return _componentManager.GetComponent<T>();
   }
 
+  public void RemoveComponent<T>() where T : Component {
+    _componentManager.RemoveComponent<T>();
+  }
+
   public ComponentManager GetComponentManager() {
     return _componentManager;
   }

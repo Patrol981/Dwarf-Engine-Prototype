@@ -16,7 +16,7 @@ public class ObjLoader : MeshLoader {
   }
 
 
-  public override MasterMesh Load(string path) {
+  public override MasterMesh Load(string path, bool useTextures = true) {
     string[] pathElements = path.Split('/');
     string filename = $"{path}/{pathElements[pathElements.Length - 1]}.obj";
     var scene = _assimpContext.ImportFile(filename);

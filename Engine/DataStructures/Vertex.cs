@@ -10,4 +10,7 @@ public struct Vertex {
   public Color4 Colors;
   public Vector3 Tangent;
   public Vector3 Bitangent;
+  public Vector3i JointIds;
+  public Vector3 Weights;
+  // public Joint JointHierarchy;
 }

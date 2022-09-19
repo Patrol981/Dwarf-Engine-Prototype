@@ -6,6 +6,8 @@ using Dwarf.Engine.ECS;
 using Dwarf.Engine.Shaders;
 
 namespace Dwarf.Engine.Generators;
+
+[Obsolete]
 internal class MeshGenerator : Component {
   private float _size;
   private int _vertexCount;
@@ -79,8 +81,6 @@ internal class MeshGenerator : Component {
     _vertices = vertices.ToList();
     _count = count;
 
-
-    // Mesh mesh = new Mesh(normals, null, vertices, indices, null, null, null);
     MasterMesh masterMesh = Owner!.GetComponent<MasterMesh>();
     if (masterMesh == null) {
       masterMesh = new MasterMesh();
@@ -92,52 +92,30 @@ internal class MeshGenerator : Component {
     _model = Matrix4.Identity;
     _shader = new Shader("./Shaders/vertexShader.vert", "./Shaders/fragmentShader.frag");
 
-    List<Vector3> array = new();
     List<Vector3> verts = new();
     List<Vector3> norms = new();
     List<Vector3> colors = new();
     for (int i = 0; i < vertices.Length; i += 3) {
       verts.Add(new Vector3(vertices[i], vertices[i + 1], vertices[i + 2]));
-      // verts.AddRange(new float[] { vertices[i], vertices[i + 1], vertices[i + 2] });
     }
     for (int i = 0; i < normals.Length; i += 3) {
       verts.Add(new Vector3(normals[i], normals[i + 1], normals[i + 2]));
-      // norms.AddRange(new float[] { normals[i], normals[i + 1], normals[i + 2] });
     }
     for (int i = 0; i < count; i++) {
       colors.Add(new Vector3(1, 1, 1));
     }
 
     for (int i = 0; i < _vertices.Count; i += 3) {
-      //_vertexArray.AddRange(new float[] { vertices[i], vertices[i + 1], vertices[i + 2] });
-      //_vertexArray.AddRange(new float[] { normals[i], normals[i + 1], normals[i + 2] });
       Vertex v = new();
       v.Position = new Vector3(vertices[i], vertices[i + 1], vertices[i+2]);
       v.Normal = new Vector3(normals[i], normals[i + 1], normals[i + 2]);
-      /*
-      _vertexArray.AddRange(
-          new float[] {
-            vertices[i],
-            vertices[i + 1],
-            vertices[i + 2],
-            normals[i],
-            normals[i + 1],
-            normals[i + 2],
-          }
-      );
-      */
-
       _vertexArray.Add(v);
-
-
     }
 
     mesh.Vertices = verts.ToList();
     mesh.Normals = norms;
     mesh.VertexArray = _vertexArray;
     mesh.Indices = _indices;
-
-    // mesh.CalculateVertexArray(mesh.MeshRenderType);
 
     mesh.Texture = Textures.Texture.LoadFromFile("Resources/grass.png");
 
@@ -146,32 +124,4 @@ internal class MeshGenerator : Component {
     masterMesh.RecalculateMeshes();
     return masterMesh;
   }
-
-  /*
-  public void Render(Camera camera) {
-    if (Owner!.GetComponent<MasterMesh>() == null) {
-      return;
-    }
-
-    var mesh = Owner.GetComponent<Mesh>();
-
-    _shader.Use();
-    _shader.SetVector3("aPosition", camera.Owner!.GetComponent<Transform>().Position);
-
-    Material material = Owner!.GetComponent<Material>();
-    _shader.SetVector3("uDiffuse", material?.GetColor() ?? new Vector3(1, 0.5f, 0.3f));
-
-    Matrix4 projection = camera.GetProjectionMatrix();
-    Matrix4 view = camera.GetViewMatrix();
-    _shader.SetMatrix4("uProjection", projection);
-    _shader.SetMatrix4("uView", view);
-
-    Matrix4 worldModel = _model * Matrix4.CreateTranslation(Owner.GetComponent<Transform>().Position);
-    _shader.SetMatrix4("uModel", worldModel);
-
-    GL.BindVertexArray(_vao);
-    // GL.DrawArrays(PrimitiveType.Triangles, 0, mesh.VertexArray.Count);
-    GL.DrawElements(PrimitiveType.Triangles, mesh.VertexArray.Count, DrawElementsType.UnsignedInt, 0);
-  }
-  */
 }
