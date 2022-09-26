@@ -16,5 +16,5 @@ void main(void) {
     vec3 viewDir = normalize(uViewPos - vFragPos);
     float cc = max(abs(dot(viewDir,norm)), 0.3f);
     vec3 res = vec3(cc*uDiffuse);
-    vFragColor = texture(texture1, texCoord) * vec4(res, 1f);
+    vFragColor = texture(texture1, texCoord) * vec4(res, 1);
 }

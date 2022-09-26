@@ -4,7 +4,6 @@ using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Mathematics;
 
-
 using Dwarf.Engine.Globals;
 using Dwarf.Engine.GUI;
 
@@ -89,6 +88,13 @@ public class Window : GameWindow {
   protected override void OnResize(ResizeEventArgs e) {
     base.OnResize(e);
     _onResize?.Invoke();
+    var oldSettings = WindowSettings.GetNativeWindowSettings();
+    var newSettings = new NativeWindowSettings {
+      Size = new Vector2i(e.Size.X, e.Size.Y),
+      Title = oldSettings.Title,
+      Flags = oldSettings.Flags
+    };
+    WindowSettings.SetNativeWindowSettings(newSettings);
     GL.Viewport(0, 0, WindowSettings.GetNativeWindowSettings().Size.X, WindowSettings.GetNativeWindowSettings().Size.Y);
     _controller.WindowResized(ClientSize.X, ClientSize.Y);
   }

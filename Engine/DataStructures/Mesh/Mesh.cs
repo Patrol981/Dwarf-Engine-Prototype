@@ -38,6 +38,18 @@ public class Mesh : Component {
   }
 
   public Mesh(
+    List<Vertex> vertexArray,
+    List<int> indices,
+    Texture texture,
+    string name = null!
+  ) {
+    _vertexArray = vertexArray;
+    _indices = indices;
+    _texture = texture;
+    _name = name;
+  }
+
+  public Mesh(
     List<Vector3> posList,
     List<Color4> colorList,
     List<Vector3> texList,

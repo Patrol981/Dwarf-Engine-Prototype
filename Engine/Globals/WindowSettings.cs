@@ -9,10 +9,10 @@ namespace Dwarf.Engine.Globals;
 public static class WindowSettings {
   private static NativeWindowSettings s_nativeWindowGameSettings = new NativeWindowSettings {
     Size = new Vector2i(1200,700),
-      Title = "Dwarf Engine Window",
-      // WindowState = WindowState.Fullscreen,
-      Flags = ContextFlags.ForwardCompatible
-      // APIVersion = new Version(4,6)
+    Title = "Dwarf Engine Window",
+    // WindowState = WindowState.Fullscreen,
+    Flags = ContextFlags.ForwardCompatible
+    // APIVersion = new Version(4,6)
   };
 
   public static NativeWindowSettings GetNativeWindowSettings() {

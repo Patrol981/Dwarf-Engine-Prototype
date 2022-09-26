@@ -4,10 +4,16 @@ using Dwarf.Engine.Cameras;
 using Dwarf.Engine.DataStructures;
 using Dwarf.Engine.ECS;
 using Dwarf.Engine.Shaders;
+using System.IO;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 
 namespace Dwarf.Engine.Generators;
 public class Chunk : Component {
   private float _size;
+
+  const float MaxHeight = 40;
+  const float MaxPixelColor = 256 * 256 * 256;
 
   public Chunk() { }
 
@@ -23,17 +29,18 @@ public class Chunk : Component {
     List<Vector3> vertices = new();
     List<Vector3> normals = new();
     List<Vector2> textureCoords = new();
-
     List<int> indices = new();
 
-    int vertexCount = 32;
+    Image<Rgba32> image = Image.Load<Rgba32>("Resources/heightmap.png");
+
+    int vertexCount = image.Height; //32;
     var vertexArray = new List<Vertex>();
 
     for (int i = 0; i < vertexCount; i++) {
-      for(int j= 0; j < vertexCount; j++) {
+      for (int j= 0; j < vertexCount; j++) {
         var vert = new Vector3(
           (float)j / ((float)vertexCount - 1) * size,
-          0,
+          GetHeight(j,i,image, 4),
           (float)i / ((float)vertexCount - 1) * size
         );
         var normal = new Vector3(
@@ -72,7 +79,16 @@ public class Chunk : Component {
       }
     }
 
-    var mesh = new Mesh(vertexArray, indices);
+    var mesh = new Mesh(vertexArray, indices, Textures.Texture.LoadFromFile($"Resources/chr_knight/chr_knight.png"));
     return mesh;
+  }
+
+  static float GetHeight(int x, int y, Image<Rgba32> image, float interpolation = 1) {
+    if(x<0 || x>=image.Height || y<0 || y>=image.Height) {
+      return 0;
+    }
+    float r = image[x, y].R;
+    float percentage = (r / 255) * interpolation;
+    return percentage;
   }
 }

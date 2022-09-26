@@ -37,11 +37,15 @@ public class FbxLoader : MeshLoader {
 
         var aMesh = scene.Meshes[index];
 
+        var vertexArray = new List<Vertex>();
+
         foreach (Face face in aMesh.Faces) {
           for (int i = 0; i < face.IndexCount; i++) {
             int indice = face.Indices[i];
 
             indices.Add(indice);
+
+            var vertex = new Vertex();
 
             bool hasColors = aMesh.HasVertexColors(0);
             bool hasTexCoords = aMesh.HasTextureCoords(0);
@@ -49,31 +53,33 @@ public class FbxLoader : MeshLoader {
             if (hasColors) {
               Color4 vertColor = FromColor(aMesh.VertexColorChannels[0][indice]);
               colorList.Add(vertColor);
+              vertex.Colors = vertColor;
             }
             if (aMesh.HasNormals) {
               Vector3 normal = FromVector(aMesh.Normals[indice]);
               normalList.Add(normal);
+              vertex.Normal = normal;
             }
             if (hasTexCoords) {
               Vector3 uvw = FromVector(aMesh.TextureCoordinateChannels[0][indice]);
               texList.Add(uvw);
+              vertex.TextureCoords = uvw.Xy;
             }
             Vector3 pos = FromVector(aMesh.Vertices[indice]);
             posList.Add(pos);
+            vertex.Position = pos;
+
+            vertexArray.Add(vertex);
           }
         }
 
         DataStructures.Mesh mesh = new(
-            posList,
-            colorList,
-            texList,
-            normalList,
-            indices,
-            null!,
-            useTextures == true ? Textures.Texture.LoadFromFile($"{path}/{x}.png") : null!,
-            //Textures.Texture.LoadFromFile($"Resources/{pathElements[pathElements.Length-1]}/{x}.png"),
-            aMesh.Name
+          vertexArray,
+          indices,
+          useTextures == true ? Textures.Texture.LoadFromFile($"{path}/{x}.png") : null!,
+          aMesh.Name
         );
+        
         x++;
         meshes.Add(mesh);
       }

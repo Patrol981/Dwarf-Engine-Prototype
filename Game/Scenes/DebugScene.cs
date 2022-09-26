@@ -52,12 +52,12 @@ public class DebugScene : Scene {
 
     var newTerrain = new Entity();
     Entities.Add(newTerrain);
-    newTerrain.AddComponent(new Transform(new Vector3(-100, 0, -100)));
+    newTerrain.AddComponent(new Transform(new Vector3(-20, 0, -20)));
     newTerrain.AddComponent(new Material(new Vector3(1, 1, 1)));
     newTerrain.AddComponent(new MasterMesh());
     newTerrain.AddComponent(new MeshRenderer());
 
-    var chunk = Chunk.SetupMesh(100);
+    var chunk = Chunk.SetupMesh(20);
     newTerrain.GetComponent<MasterMesh>().Meshes.Add(chunk);
 
     newTerrain.GetComponent<MeshRenderer>().Init("./Shaders/terrain.vert", "./Shaders/terrain.frag");
