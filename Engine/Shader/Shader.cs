@@ -20,9 +20,9 @@ public class Shader {
     GL.DeleteProgram(_handle);
   }
 
-  public Shader(string vertexPath, string fragmentPath) {
-    var vertexShaderSource = File.ReadAllText(vertexPath);
-    var fragmentShaderSource = File.ReadAllText(fragmentPath);
+  public Shader(string vertexData, string fragmentData, bool isFile = true) {
+    var vertexShaderSource = isFile ? File.ReadAllText(vertexData) : vertexData;
+    var fragmentShaderSource = isFile ? File.ReadAllText(fragmentData) : fragmentData;
 
     var vertexShader = GL.CreateShader(ShaderType.VertexShader);
     GL.ShaderSource(vertexShader, vertexShaderSource);

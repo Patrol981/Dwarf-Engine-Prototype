@@ -85,7 +85,7 @@ public class FbxLoader : MeshLoader {
       }
     }
 
-    MasterMesh masterMesh = new(meshes, Enums.MeshRenderType.FbxModel);
+    MasterMesh masterMesh = new(meshes);
     return masterMesh;
   }
 

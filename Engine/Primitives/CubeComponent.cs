@@ -58,7 +58,7 @@ public class CubeComponent : Component {
     );
 
     Dwarf.Engine.DataStructures.MasterMesh masterMesh = new Dwarf.Engine.DataStructures.MasterMesh(
-      new List<Dwarf.Engine.DataStructures.Mesh> { mesh }, MeshRenderType.Standard);
+      new List<Dwarf.Engine.DataStructures.Mesh> { mesh });
     return masterMesh;
   }
 }

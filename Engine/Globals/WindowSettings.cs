@@ -1,3 +1,4 @@
+using Dwarf.Engine.Windowing;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
@@ -8,7 +9,7 @@ namespace Dwarf.Engine.Globals;
 
 public static class WindowSettings {
   private static NativeWindowSettings s_nativeWindowGameSettings = new NativeWindowSettings {
-    Size = new Vector2i(1200,700),
+    Size = new Vector2i(1200, 700),
     Title = "Dwarf Engine Window",
     // WindowState = WindowState.Fullscreen,
     Flags = ContextFlags.ForwardCompatible

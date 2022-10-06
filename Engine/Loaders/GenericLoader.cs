@@ -29,7 +29,7 @@ public class GenericLoader : MeshLoader {
     }
     
 
-    return new MasterMesh(_meshes, Enums.MeshRenderType.FbxModel);
+    return new MasterMesh(_meshes);
   }
 
   private void ProcessNode(Node node, Scene scene) {
@@ -194,7 +194,7 @@ public class GenericLoader : MeshLoader {
       }
     }
 
-    return new MasterMesh(meshes, Enums.MeshRenderType.FbxModel);
+    return new MasterMesh(meshes);
   }
 
   private Vector3 FromVector(Vector3D vec) {

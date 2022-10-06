@@ -50,6 +50,7 @@ public class EngineClass {
       WindowGlobalState.SetWindow(_window);
     } else {
       _window = window;
+      WindowGlobalState.SetWindow(_window);
     }
 
     _window.BindUpdateCallback(OnUpdate);
@@ -69,7 +70,7 @@ public class EngineClass {
 
     _skybox = new Skybox(_window.Size.X / (float)_window.Size.Y);
 
-    _raycaster = new((Camera)CameraGlobalState.GetCamera());
+    _raycaster = new((Camera)CameraGlobalState.GetCamera(), CameraGlobalState.GetCamera().GetProjectionMatrix());
 
   }
 
@@ -116,5 +117,19 @@ public class EngineClass {
 
   public void AddToScene(Entity entity) {
     Scene.Entities.Add(entity);
+  }
+
+  public List<Entity> GetEntities() {
+    return Scene.Entities;
+  }
+
+  public void RemoveEntity(Entity entity) {
+    if (Scene.Entities.Contains(entity)) {
+      Scene.Entities.Remove(entity);
+    }
+  }
+
+  public Raycaster Raycaster {
+    get { return _raycaster; }
   }
 }

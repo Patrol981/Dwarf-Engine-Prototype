@@ -12,9 +12,13 @@ using Dwarf.Engine.ECS;
 namespace Dwarf.Engine.Cameras;
 
 public class FreeCamera : Camera, ICamera {
-  public FreeCamera(float aspectRatio) : base(aspectRatio) {}
+  public FreeCamera(float aspectRatio) : base(aspectRatio) {
+    WindowGlobalState.SetCursorVisible(false);
+  }
 
-  public FreeCamera() {}
+  public FreeCamera() {
+    WindowGlobalState.SetCursorVisible(false);
+  }
 
   public void HandleMovement() {
     if(CameraGlobalState.GetFirstMove()) {

@@ -21,4 +21,16 @@ public class Transform : Component {
     Rotation = rotation;
   }
 
+  public void IncreasePosition(Vector3 position) {
+    Position.X += position.X;
+    Position.Y += position.Y;
+    Position.Z += position.Z;
+  }
+
+  public void IncreaseRotation(Vector3 rotation) {
+    Rotation.X += rotation.X;
+    Rotation.Y += rotation.Y;
+    Rotation.Z += rotation.Z;
+  }
+
 }

@@ -25,7 +25,7 @@ public class Chunk : Component {
   /// Method suggested to use only when creating multiple chunks
   /// </summary>
   /// <returns>Mesh</returns>
-  public static Mesh SetupMesh(float size) {
+  public static TerrainMesh SetupMesh(float size) {
     List<Vector3> vertices = new();
     List<Vector3> normals = new();
     List<Vector2> textureCoords = new();
@@ -34,13 +34,20 @@ public class Chunk : Component {
     Image<Rgba32> image = Image.Load<Rgba32>("Resources/heightmap.png");
 
     int vertexCount = image.Height; //32;
+
+    var heights = new float[vertexCount, vertexCount];
+    float interpolation = 12;
+
     var vertexArray = new List<Vertex>();
 
     for (int i = 0; i < vertexCount; i++) {
       for (int j= 0; j < vertexCount; j++) {
+        float height = GetHeight(j, i, image, interpolation);
+        heights[j, i] = height;
+
         var vert = new Vector3(
           (float)j / ((float)vertexCount - 1) * size,
-          GetHeight(j,i,image, 4),
+          height,
           (float)i / ((float)vertexCount - 1) * size
         );
         var normal = new Vector3(
@@ -79,7 +86,15 @@ public class Chunk : Component {
       }
     }
 
-    var mesh = new Mesh(vertexArray, indices, Textures.Texture.LoadFromFile($"Resources/chr_knight/chr_knight.png"));
+    var mesh = new TerrainMesh(
+      vertexArray,
+      indices,
+      Textures.Texture.LoadFromFile($"Resources/grassy2.png"),
+      heights,
+      size,
+      interpolation,
+      vertexCount
+    );
     return mesh;
   }
 

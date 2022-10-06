@@ -21,72 +21,12 @@ public class MasterMesh : Component {
 
   public MasterMesh() {
     _meshes = new List<Mesh>();
-    _meshRenderType = MeshRenderType.Standard;
+    _meshRenderType = MeshRenderType.Mesh;
   }
 
-  public MasterMesh(List<Mesh> meshes, MeshRenderType meshRenderType) {
+  public MasterMesh(List<Mesh> meshes, MeshRenderType renderType = MeshRenderType.Mesh) {
     _meshes = meshes;
-    _meshRenderType = meshRenderType;
-  }
-
-  [Obsolete]
-  public void RecalculateMeshes() {
-    _vertexArray = new List<Vertex>();
-
-    for(int i = 0; i < _meshes.Count; i++) {
-      _vertexArray.AddRange(_meshes[i].VertexArray);
-      if (_meshes[i].Indices != null) {
-        _indices.AddRange(_meshes[i].Indices);
-      }
-    }
-
-    Console.WriteLine(_meshRenderType);
-    if( _meshRenderType == MeshRenderType.FbxModel ) {
-      Console.WriteLine(_vertexArray);
-    }
-    
-
-    CalculateVertexArray(_meshRenderType);
-  }
-
-  [Obsolete]
-  public void CalculateVertexArray(MeshRenderType meshRenderType) {
-    // GL.VertexArrayVertexBuffer(_vertexArray, inPos, _vertexBuffer, IntPtr.Zero, Unsafe.SizeOf<ImDrawVert>());
-    switch (meshRenderType) {
-      case MeshRenderType.Standard: {
-          _bufferDataCount = _vertexArray.Count * Unsafe.SizeOf<Vertex>();
-          _packageStrideSize = 5 * Unsafe.SizeOf<Vertex>();
-          _drawCount = 36;
-          break;
-        }
-
-      case MeshRenderType.WavefrontObjFile: {
-          _bufferDataCount = _vertexArray.Count * Unsafe.SizeOf<Vertex>();
-          _packageStrideSize = 9 * Unsafe.SizeOf<Vertex>();
-          _drawCount = _vertexArray.Count;
-          break;
-        }
-
-      case MeshRenderType.FbxModel: {
-          // _bufferDataCount = _vertexArray.Count * sizeof(float);
-          _bufferDataCount = _vertexArray.Count * Unsafe.SizeOf<Vertex>();
-          _packageStrideSize = Unsafe.SizeOf<Vertex>();
-          _drawCount = _vertexArray.Count;
-          _indicesCount = _indices.Count;
-          break;
-        }
-
-      case MeshRenderType.Terrain: {
-          _bufferDataCount = _vertexArray.Count * Unsafe.SizeOf<Vertex>();
-          _packageStrideSize = 6 * Unsafe.SizeOf<Vertex>();
-          _drawCount = _vertexArray.Count;
-          break;
-        }
-
-      default: {
-          break;
-        }
-    }
+    _meshRenderType = renderType;
   }
 
   public List<Mesh> Meshes {

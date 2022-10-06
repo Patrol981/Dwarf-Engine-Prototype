@@ -11,7 +11,7 @@ public static class WindowGlobalState {
   private static double _time;
   private static MouseState? _mouseState;
   private static KeyboardState? _keyboardState;
-  private static bool _cursorVisible;
+  private static bool _cursorVisible = true;
   private static Cursor _cursor;
   private static Vector2 _lastLockedCursorPosition = new Vector2(0,0);
   private static Windowing.Window? _window;

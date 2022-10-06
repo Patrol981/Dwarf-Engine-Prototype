@@ -1,6 +1,8 @@
 ﻿using Dwarf.Engine.DataStructures;
 using Dwarf.Engine.ECS;
+using Dwarf.Engine.Enums;
 using Dwarf.Engine.Globals;
+using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
@@ -12,10 +14,12 @@ public class ThirdPersonCamera : Camera, ICamera {
   
   public ThirdPersonCamera() {
     _followTarget = null!;
+    WindowGlobalState.SetCursorVisible(false);
   }
 
   public ThirdPersonCamera(float aspectRatio, Entity followTarget) : base(aspectRatio) {
     _followTarget = followTarget;
+    WindowGlobalState.SetCursorVisible(false);
   }
 
   private void CalculateZoom() {
@@ -68,6 +72,20 @@ public class ThirdPersonCamera : Camera, ICamera {
             break;
           case false:
             WindowGlobalState.SetCursorVisible(true);
+            break;
+        }
+      }
+
+      if (WindowGlobalState.GetKeyboardState().IsKeyPressed(Keys.Tab)) {
+        var currentRenderMode = CameraGlobalState.GetWindowRenderMode();
+        switch (currentRenderMode) {
+          case WindowRenderMode.Normal:
+            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
+            CameraGlobalState.SetWindowRenderMode(WindowRenderMode.Wireframe);
+            break;
+          case WindowRenderMode.Wireframe:
+            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
+            CameraGlobalState.SetWindowRenderMode(WindowRenderMode.Normal);
             break;
         }
       }

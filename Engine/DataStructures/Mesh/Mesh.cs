@@ -19,6 +19,10 @@ public class Mesh : Component {
   private Texture _texture;
   private Shader? _shader;
 
+  public Mesh(List<Vertex> vertexArray) {
+    _vertexArray = vertexArray;
+  }
+
   public Mesh(
     List<Vertex> vertexArray,
     List<int> indices,

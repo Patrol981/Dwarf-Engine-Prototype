@@ -93,7 +93,7 @@ public class SimpleObjLoader : MeshLoader {
 
     mesh.Texture.Use(OpenTK.Graphics.OpenGL4.TextureUnit.Texture0);
 
-    MasterMesh masterMesh = new MasterMesh(new List<Mesh> { mesh }, MeshRenderType.WavefrontObjFile);
+    MasterMesh masterMesh = new MasterMesh(new List<Mesh> { mesh });
     return masterMesh;
   }
 

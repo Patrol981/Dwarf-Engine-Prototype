@@ -5,22 +5,30 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 using OpenTK.Mathematics;
 using Dwarf.Engine.Cameras;
 using Dwarf.Engine.Physics;
+using BulletSharp;
+using Dwarf.Engine.DataStructures;
 
 namespace Dwarf.Engine.Controllers;
 public class TransformController : Component {
   private float _speed;
-  private float _gravity = 0.1f;
+  private float _gravity = -50;
   private float _jumpHeight = 2f;
+  private float _jumpPower = 20;
+  private float _upwardsSpeed = 0;
 
   private bool _groundCheck = false;
   private bool _isJumping = false;
 
   private float _left, _right, _front, _back;
+  private TerrainMesh _terrain;
+  private Entity _terrainPosition;
 
   public TransformController() { }
 
-  public TransformController(float speed) {
+  public TransformController(float speed, MasterMesh masterMesh = null!) {
     _speed = speed;
+    _terrain = (TerrainMesh)masterMesh.Meshes[0];
+    _terrainPosition = masterMesh.Owner!;
   }
 
   private bool CollisionCheck() {
@@ -38,13 +46,15 @@ public class TransformController : Component {
   public void HandleMovement() {
     Camera camera = CameraGlobalState.GetCamera();
     // Owner.GetComponent<Transform>().Rotation = camera.GetComponent<ThirdPersonCamera>().Front;
-
-    if(Owner!.GetComponent<Transform>().Position.Y > 0) {
-      _groundCheck = false;
-      if (_isJumping) return;
-      Owner!.GetComponent<Transform>().Position.Y -= _gravity;
-    } else {
-      Owner!.GetComponent<Transform>().Position.Y = 0;
+    _upwardsSpeed += _gravity * (float)WindowGlobalState.GetTime();
+    Owner!.GetComponent<Transform>().IncreasePosition(
+      new Vector3(0, _upwardsSpeed * (float)WindowGlobalState.GetTime(), 0)
+    );
+    var pos = Owner!.GetComponent<Transform>().Position;
+    float terrainHeight = _terrain.GetHeightOfTerrain(pos.X, pos.Z, _terrainPosition);
+    if (Owner!.GetComponent<Transform>().Position.Y < terrainHeight) {
+      _upwardsSpeed = 0;
+      Owner!.GetComponent<Transform>().Position.Y = terrainHeight;
       _groundCheck = true;
     }
 
@@ -80,14 +90,14 @@ public class TransformController : Component {
     }
 
     if (WindowGlobalState.GetKeyboardState().IsKeyDown(Keys.Space)) {
-      if (_isJumping) return;
-      if (!_groundCheck) return;
-      _isJumping = true;
-      while(Owner!.GetComponent<Transform>().Position.Y < _jumpHeight) {
-        Owner!.GetComponent<Transform>().Position.Y += _gravity * (float)WindowGlobalState.GetTime();
-      }
-      _isJumping = false;
+      Jump();
     }
+  }
+
+  private void Jump() {
+    if (!_groundCheck) return;
+    _upwardsSpeed = _jumpPower;
+    _groundCheck = false;
   }
 }
 

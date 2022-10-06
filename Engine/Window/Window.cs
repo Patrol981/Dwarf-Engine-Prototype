@@ -107,7 +107,6 @@ public class Window : GameWindow {
     GL.Disable(EnableCap.Blend);
     WindowGlobalState.SetMouseState(MouseState);
     WindowGlobalState.SetKeyboardState(KeyboardState);
-    WindowGlobalState.SetCursorVisible(false);
 
    _controller = new GUIController(ClientSize.X, ClientSize.Y);
   }
