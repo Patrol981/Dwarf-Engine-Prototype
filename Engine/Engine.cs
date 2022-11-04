@@ -1,3 +1,4 @@
+using System.Linq;
 using ImGuiNET;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Desktop;
@@ -12,6 +13,9 @@ using Dwarf.Engine.Primitives;
 using Dwarf.Engine.Controllers;
 using Dwarf.Engine.Raycasting;
 using Dwarf.Engine.Physics;
+using Dwarf.Engine.DataStructures.Interfaces;
+using Dwarf.Engine.DataStructures.Enums;
+using Dwarf.Engine.Loaders;
 
 namespace Dwarf.Engine;
 
@@ -30,6 +34,10 @@ public class EngineClass {
   public void SetGUICallback(EventCallback eventCallback) {
     _onGUI = eventCallback;
   }
+
+  public void SetOnLoadCallback(EventCallback eventCallback) {
+    _onLoad = eventCallback;
+  }
   
   public Scene Scene;
 
@@ -43,6 +51,7 @@ public class EngineClass {
   private EventCallback? _onUpdate;
   private EventCallback? _onRender;
   private EventCallback? _onGUI;
+  private EventCallback? _onLoad;
 
   public EngineClass(Windowing.Window window = null!, Scene scene = null!) {
     if(window == null) {
@@ -57,6 +66,7 @@ public class EngineClass {
     _window.BindRenderCallback(OnRender);
     _window.BindResizeCallback(OnResize);
     _window.BindDrawGUICallback(OnDrawGUI);
+    _window.BindOnLoadCallback(OnLoad);
 
     if(scene == null) {
       Scene = new DebugScene();
@@ -64,7 +74,9 @@ public class EngineClass {
       Scene = scene;
     }
 
-    //_physics = new Physics.Physics();
+    // _physics = new Physics.Physics();
+
+    // var physX = new PhysXClass();
 
     _fps = new FPS();
 
@@ -78,32 +90,32 @@ public class EngineClass {
     _window.Run();
   }
 
+  protected void OnLoad() {
+    _onLoad?.Invoke();
+  }
+
   protected void OnUpdate() {
+    _onUpdate?.Invoke();
+
     _fps.Update();
 
     for(int i=0; i<Scene.Entities.Count; i++) {
-      if(Scene.Entities[i].GetComponent<TransformController>() != null) {
-        Scene.Entities[i].GetComponent<TransformController>().HandleMovement();
-      }
+      Scene.Entities[i].GetComponent<TransformController>()?.HandleMovement();
+      Scene.Entities[i].GetComponent<Rigidbody>()?.Update();
     }
-
-    _onUpdate?.Invoke();
   }
 
   protected void OnRender() {
+    _onRender?.Invoke();
+
     var camera = (ICamera)CameraGlobalState.GetCamera();
     camera.HandleMovement();
 
     _skybox.Update((Camera)camera);
     
     for (int i = 0; i < Scene.Entities.Count; i++) {
-      Scene.Entities[i].GetComponent<MeshRenderer>().Render((Camera)camera);
-      if (Scene.Entities[i].GetComponent<BoundingBox>() != null) {
-        Scene.Entities[i].GetComponent<BoundingBox>().Draw((Camera)camera);
-      }
+      Scene.Entities[i].GetComponent<MeshRenderer>()?.Render((Camera)camera);
     }
-
-    _onRender?.Invoke();
   }
 
   protected void OnResize() {
@@ -119,8 +131,42 @@ public class EngineClass {
     Scene.Entities.Add(entity);
   }
 
+  public void LoadScene(Scene scene) {
+    Scene = scene;
+  }
+
   public List<Entity> GetEntities() {
     return Scene.Entities;
+  }
+
+  public List<Entity> GetEntitiesByType(EntityType entityType) {
+    return Scene.Entities.Where(e => e.Type == entityType).ToList();
+  }
+
+
+  public List<T> GetEntities<T>() where T : Entity {
+    List<T> returnList = new();
+
+    for(int i= 0; i < Scene.Entities.Count; i++) {
+      var target = Scene.Entities[i];
+      if(target.GetType() == typeof(T)) {
+        returnList.Add((T)target);
+      }
+    }
+
+    return returnList;
+    //return (IEnumerable<T>)Scene.Entities.Where(x => x.GetType() == typeof(T));
+    /*
+    return AppDomain.CurrentDomain.GetAssemblies()
+      .SelectMany(assembly => assembly.GetTypes())
+      .Where(type => type.IsSubclassOf(typeof(T)))
+      .Select(type => Activator.CreateInstance(type) as T);
+      */
+    //return Scene.Entities.Where(x => )
+  }
+
+  public Entity? GetEntityById(Guid id) {
+    return Scene.Entities.FirstOrDefault(e => e.EntityID == id);
   }
 
   public void RemoveEntity(Entity entity) {

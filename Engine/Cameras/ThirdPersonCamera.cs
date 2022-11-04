@@ -46,6 +46,8 @@ public class ThirdPersonCamera : Camera, ICamera {
   }
 
   private void CalculateCameraPosition(float horizontal, float vertical) {
+    if (FollowTarget == null) return;
+
     float theta = _angleAroundTarget;
     float offectX = (float)(horizontal * MathF.Sin(MathHelper.DegreesToRadians(theta)));
     float offsetZ = (float)(horizontal * MathF.Cos(MathHelper.DegreesToRadians(theta)));

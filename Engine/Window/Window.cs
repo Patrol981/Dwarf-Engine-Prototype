@@ -17,6 +17,7 @@ public class Window : GameWindow {
   private onEventCallback? _onRender;
   private onEventCallback? _onDrawGUI;
   private onEventCallback? _onResize;
+  private onEventCallback? _onLoad;
 
   private GUIController _controller;
 
@@ -35,6 +36,10 @@ public class Window : GameWindow {
   }
   public void BindResizeCallback(onEventCallback callback) {
     _onResize = callback;
+  }
+
+  public void BindOnLoadCallback(onEventCallback callback) {
+    _onLoad = callback;
   }
 
   public void Clear() {
@@ -58,16 +63,18 @@ public class Window : GameWindow {
   protected override unsafe void OnRenderFrame(FrameEventArgs args) {
     base.OnRenderFrame(args);
 
-    if(!IsFocused) {
-      return;
-    }
+    //if(!IsFocused) {
+    //  return;
+    //}
 
     switch(WindowGlobalState.GetCursorVisible()) {
       case true:
-        CursorVisible = WindowGlobalState.GetCursorVisible();
+        //CursorVisible = WindowGlobalState.GetCursorVisible();
+        CursorState = CursorState.Normal;
         break;
       case false:
-        CursorGrabbed = WindowGlobalState.GetCursorGrabbed();
+        //CursorGrabbed = WindowGlobalState.GetCursorGrabbed();
+        CursorState = CursorState.Grabbed;
         break;
     }
 
@@ -102,13 +109,26 @@ public class Window : GameWindow {
   protected override void OnLoad() {
     base.OnLoad();
 
+    if(Debugging.Debugger.UseDebbuger) {
+      GL.DebugMessageCallback(Debugging.Debugger.DebugMessageDelegate, IntPtr.Zero);
+      GL.Enable(EnableCap.DebugOutput);
+      GL.Enable(EnableCap.DebugOutputSynchronous);
+    }
+    
     GL.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    // Clipping
     GL.Enable(EnableCap.DepthTest);
+    // Bounding Boxes
+    GL.Enable(EnableCap.PolygonOffsetFill);
+    GL.PolygonOffset(1, 0);
+    // Skybox
     GL.Disable(EnableCap.Blend);
     WindowGlobalState.SetMouseState(MouseState);
     WindowGlobalState.SetKeyboardState(KeyboardState);
 
-   _controller = new GUIController(ClientSize.X, ClientSize.Y);
+    _controller = new GUIController(ClientSize.X, ClientSize.Y);
+
+    _onLoad?.Invoke();
   }
 
   protected override void OnUnload() {

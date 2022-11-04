@@ -15,12 +15,15 @@
   <ItemGroup>
     <PackageReference Include="AssimpNet" Version="4.1.0" />
     <PackageReference Include="ImGui.NET" Version="1.87.2" />
-    <PackageReference Include="OpenTK" Version="4.6.7" />
-	<PackageReference Include="SixLabors.ImageSharp" Version="1.0.4" />
-	<PackageReference Include="SkiaSharp" Version="2.88.1-preview.108" />
+    <PackageReference Include="Microsoft.Maui.Graphics" Version="6.0.501" />
+    <PackageReference Include="OpenTK" Version="4.7.5" />
+    <PackageReference Include="SkiaSharp" Version="2.88.3" />
 	<PackageReference Include="StbImageSharp" Version="2.27.11" />
-	<PackageReference Include="System.Drawing.Common" Version="6.0.0" />
   </ItemGroup>
+
+	<ItemGroup>
+		<Reference Include="./DLL/*" />
+	</ItemGroup>
 
   <ItemGroup>
     <None Update="./Shaders/*">
@@ -45,8 +48,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="BulletSharp">
-      <HintPath>..\BulletSharpPInvoke-master\BulletSharp\bin\Release\netstandard2.1\BulletSharp.dll</HintPath>
+    <ProjectReference Include="..\BulletSharpPInvoke-master\BulletSharp\BulletSharp.DotNetCore.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="PhysX.Net">
+      <HintPath>DLL\PhysX.Net.dll</HintPath>
     </Reference>
   </ItemGroup>
 

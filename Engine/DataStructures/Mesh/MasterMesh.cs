@@ -17,7 +17,7 @@ public class MasterMesh : Component {
   private int _indicesCount = 0;
   private MeshRenderType _meshRenderType;
 
-  public Textures.Texture Texture;
+  private bool _render = true;
 
   public MasterMesh() {
     _meshes = new List<Mesh>();
@@ -63,6 +63,11 @@ public class MasterMesh : Component {
 
   public int IndicesCount {
     get { return _indicesCount; }
+  }
+
+  public bool Render {
+    get { return _render; }
+    set { _render = value; }
   }
 
 }

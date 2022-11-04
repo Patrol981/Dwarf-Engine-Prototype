@@ -36,7 +36,6 @@ public class FbxLoader : MeshLoader {
         List<int> indices = new();
 
         var aMesh = scene.Meshes[index];
-
         var vertexArray = new List<Vertex>();
 
         foreach (Face face in aMesh.Faces) {
@@ -76,7 +75,7 @@ public class FbxLoader : MeshLoader {
         DataStructures.Mesh mesh = new(
           vertexArray,
           indices,
-          useTextures == true ? Textures.Texture.LoadFromFile($"{path}/{x}.png") : null!,
+          useTextures == true ? Textures.Texture.FastTextureLoad($"{path}/{x}.png") : null!,
           aMesh.Name
         );
         

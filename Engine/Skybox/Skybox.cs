@@ -3,13 +3,12 @@ using OpenTK.Mathematics;
 //using System.Drawing;
 //using System.Drawing.Imaging;
 
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
 using Dwarf.Engine.Cameras;
 using Dwarf.Engine.ECS;
 using Dwarf.Engine.Globals;
 using Dwarf.Engine.Shaders;
+using StbImageSharp;
+using System.IO;
 
 namespace Dwarf.Engine.Skyboxes;
 public class Skybox {
@@ -142,24 +141,13 @@ public class Skybox {
     GL.BindTexture(TextureTarget.TextureCubeMap, _textureID);
 
     for (int i = 0; i < faces.Count; i++) {
-      Image<Rgba32> image = Image.Load<Rgba32>(faces[i]);
-      // image.Mutate(x => x.Flip(FlipMode.Vertical));
+      StbImage.stbi_set_flip_vertically_on_load(0);
 
-      var pixels = new List<byte>(4 * image.Width * image.Height);
-
-      for (short y = 0; y < image.Height; y++) {
-        var row = image.GetPixelRowSpan(y);
-
-        for (short x = 0; x < image.Width; x++) {
-          pixels.Add(row[x].R);
-          pixels.Add(row[x].G);
-          pixels.Add(row[x].B);
-          pixels.Add(row[x].A);
-        }
-      }
+      using var stream = File.OpenRead(faces[i]);
+      var image = ImageResult.FromStream(stream, ColorComponents.RedGreenBlueAlpha);
 
       GL.TexImage2D(
-        targets[i], // <------
+        targets[i],
         0,
         PixelInternalFormat.Rgba,
         image.Width,
@@ -167,7 +155,7 @@ public class Skybox {
         0,
         PixelFormat.Rgba,
         PixelType.UnsignedByte,
-        pixels.ToArray()
+        image.Data
       );
     }
 
@@ -176,9 +164,5 @@ public class Skybox {
     GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapS, (int)TextureParameterName.ClampToEdge);
     GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapT, (int)TextureParameterName.ClampToEdge);
     GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapR, (int)TextureParameterName.ClampToEdge);
-
-
-
-    // return 0;
   }
 }

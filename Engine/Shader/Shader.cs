@@ -17,7 +17,7 @@ public class Shader {
   private bool _disposed = false;
 
   ~Shader() {
-    GL.DeleteProgram(_handle);
+    // GL.DeleteProgram(_handle);
   }
 
   public Shader(string vertexData, string fragmentData, bool isFile = true) {

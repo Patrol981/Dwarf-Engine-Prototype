@@ -15,16 +15,24 @@ public class GenericLoader : MeshLoader {
 
     Assimp.LogStream.IsVerboseLoggingEnabled = true;
     _logger = new Assimp.ConsoleLogStream();
-    _logger.Attach();
+    // _logger.Attach();
   }
 
   public override MasterMesh Load(string path, bool useTextures = true) {
-    var scene = _assimpContext.ImportFile($"{path}", PostProcessSteps.Triangulate | PostProcessSteps.GenerateSmoothNormals | PostProcessSteps.FlipUVs | PostProcessSteps.CalculateTangentSpace);
+    string[] pathElements = path.Split('/');
+    string ext = path.Substring(path.Length - 3);
+    string filename = $"{path}/{pathElements[pathElements.Length - 1]}.{ext}";
+    var scene = _assimpContext.ImportFile($"{path}",
+      PostProcessSteps.Triangulate |
+      PostProcessSteps.GenerateSmoothNormals |
+      PostProcessSteps.FlipUVs |
+      PostProcessSteps.CalculateTangentSpace
+    );
+    //var scene = _assimpContext.ImportFile($"{path}", PostProcessSteps.Triangulate | PostProcessSteps.GenerateSmoothNormals | PostProcessSteps.FlipUVs | PostProcessSteps.CalculateTangentSpace);
 
     var node = scene.RootNode;
 
     for(int i=0; i<node.ChildCount; i++) {
-      Console.WriteLine($"Processing Node {node.Children[i].Name}");
       ProcessNode(node.Children[i], scene);
     }
     
@@ -44,7 +52,8 @@ public class GenericLoader : MeshLoader {
     List<int> indices = new List<int>();
     List<Textures.TextureStruct> textures = new List<Textures.TextureStruct>();
 
-    Console.WriteLine($"Processing Mesh {mesh.Name}");
+    var vertexArray = new List<Vertex>();
+
     for (int i=0; i<mesh.Vertices.Count; i++) {
       Vertex v = new();
       Vector3 vec = new();
@@ -106,8 +115,11 @@ public class GenericLoader : MeshLoader {
     List<Textures.TextureStruct> heightMaps = LoadMaterialTextures(aMaterial, TextureType.Height, TextureType.Height);
     textures.InsertRange(textures.Count, heightMaps);
 
-    var returnMesh = new DataStructures.Mesh(vertices, indices, textures);
-    Console.WriteLine($"Returning Mesh {mesh.Name}");
+    var returnMesh = new DataStructures.Mesh(
+      vertices,
+      indices,
+      textures
+    );
 
     return returnMesh;
   }
@@ -127,8 +139,10 @@ public class GenericLoader : MeshLoader {
         }
       }
       if(!skip) {
+        string[] filename = textureSlot.FilePath.Split('.');
+
         Textures.TextureStruct textureStruct;
-        textureStruct.Id = Textures.Texture.FastTextureLoad($"Resources/{textureSlot.FilePath}").Handle;
+        textureStruct.Id = Textures.Texture.FastTextureLoad($"Resources/{filename[0]}/{textureSlot.FilePath}").Handle;
         textureStruct.Type = typeName.ToString();
         textureStruct.Path = textureSlot.FilePath;
         materialTextures.Add(textureStruct);
@@ -155,12 +169,14 @@ public class GenericLoader : MeshLoader {
         List<int> indices = new();
 
         var aMesh = scene.Meshes[index];
+        var vertexArray = new List<Vertex>();
 
         foreach (Face face in aMesh.Faces) {
           for (int i = 0; i < face.IndexCount; i++) {
             int indice = face.Indices[i];
 
             indices.Add(indice);
+            var vertex = new Vertex();
 
             bool hasColors = aMesh.HasVertexColors(0);
             bool hasTexCoords = aMesh.HasTextureCoords(0);
@@ -168,17 +184,23 @@ public class GenericLoader : MeshLoader {
             if (hasColors) {
               Color4 vertColor = FromColor(aMesh.VertexColorChannels[0][indice]);
               colorList.Add(vertColor);
+              vertex.Colors = vertColor;
             }
             if (aMesh.HasNormals) {
               Vector3 normal = FromVector(aMesh.Normals[indice]);
               normalList.Add(normal);
+              vertex.Normal = normal;
             }
             if (hasTexCoords) {
               Vector3 uvw = FromVector(aMesh.TextureCoordinateChannels[0][indice]);
               texList.Add(uvw);
+              vertex.TextureCoords = uvw.Xy;
             }
             Vector3 pos = FromVector(aMesh.Vertices[indice]);
             posList.Add(pos);
+            vertex.Position = pos;
+
+            vertexArray.Add(vertex);
           }
         }
 

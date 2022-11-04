@@ -13,6 +13,7 @@ public static class WindowGlobalState {
   private static KeyboardState? _keyboardState;
   private static bool _cursorVisible = true;
   private static Cursor _cursor;
+  private static CursorState _cursorState = CursorState.Normal;
   private static Vector2 _lastLockedCursorPosition = new Vector2(0,0);
   private static Windowing.Window? _window;
 
@@ -40,6 +41,10 @@ public static class WindowGlobalState {
     _cursor = cursor;
   }
 
+  public static void SetCursorState(CursorState cursorState) {
+    _cursorState = cursorState;
+  }
+
   public static void SetCursorLastLockedPosition(Vector2 position) {
     _lastLockedCursorPosition = position;
   }
@@ -64,6 +69,10 @@ public static class WindowGlobalState {
       return null!;
     }
     return _keyboardState;
+  }
+
+  public static CursorState GetCursorState() {
+    return _cursorState;
   }
 
   public static bool GetCursorVisible() {

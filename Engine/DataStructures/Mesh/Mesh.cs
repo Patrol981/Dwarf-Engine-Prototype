@@ -17,7 +17,6 @@ public class Mesh : Component {
   private string _name;
 
   private Texture _texture;
-  private Shader? _shader;
 
   public Mesh(List<Vertex> vertexArray) {
     _vertexArray = vertexArray;
@@ -146,10 +145,6 @@ public class Mesh : Component {
 
   public List<TextureStruct> TextureArray {
     get { return _textureArray; }
-  }
-
-  public Shader Shader {
-    get { return _shader!; }
   }
 
   public string Name {

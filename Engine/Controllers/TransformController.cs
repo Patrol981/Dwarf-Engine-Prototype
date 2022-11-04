@@ -27,8 +27,8 @@ public class TransformController : Component {
 
   public TransformController(float speed, MasterMesh masterMesh = null!) {
     _speed = speed;
-    _terrain = (TerrainMesh)masterMesh.Meshes[0];
-    _terrainPosition = masterMesh.Owner!;
+    //_terrain = (TerrainMesh)masterMesh.Meshes[0];
+    //_terrainPosition = masterMesh.Owner!;
   }
 
   private bool CollisionCheck() {
@@ -46,6 +46,7 @@ public class TransformController : Component {
   public void HandleMovement() {
     Camera camera = CameraGlobalState.GetCamera();
     // Owner.GetComponent<Transform>().Rotation = camera.GetComponent<ThirdPersonCamera>().Front;
+    /*
     _upwardsSpeed += _gravity * (float)WindowGlobalState.GetTime();
     Owner!.GetComponent<Transform>().IncreasePosition(
       new Vector3(0, _upwardsSpeed * (float)WindowGlobalState.GetTime(), 0)
@@ -57,6 +58,7 @@ public class TransformController : Component {
       Owner!.GetComponent<Transform>().Position.Y = terrainHeight;
       _groundCheck = true;
     }
+    */
 
     //float front = 90 - ((camera.Yaw));
     //float back = (camera.Yaw + 90) * -1;
@@ -95,9 +97,12 @@ public class TransformController : Component {
   }
 
   private void Jump() {
+    Owner!.GetComponent<Rigidbody>().AddForce(_jumpPower);
+    /*
     if (!_groundCheck) return;
     _upwardsSpeed = _jumpPower;
     _groundCheck = false;
+    */
   }
 }
 

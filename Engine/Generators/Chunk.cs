@@ -1,12 +1,7 @@
-﻿using OpenTK.Graphics.OpenGL4;
-using OpenTK.Mathematics;
-using Dwarf.Engine.Cameras;
+﻿using OpenTK.Mathematics;
 using Dwarf.Engine.DataStructures;
 using Dwarf.Engine.ECS;
-using Dwarf.Engine.Shaders;
-using System.IO;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
+using SkiaSharp;
 
 namespace Dwarf.Engine.Generators;
 public class Chunk : Component {
@@ -31,18 +26,20 @@ public class Chunk : Component {
     List<Vector2> textureCoords = new();
     List<int> indices = new();
 
-    Image<Rgba32> image = Image.Load<Rgba32>("Resources/heightmap.png");
+    var buff = File.ReadAllBytes("Resources/heightmap.png");
 
-    int vertexCount = image.Height; //32;
+    var skImage = SKBitmap.Decode(buff);
+
+    int vertexCount = skImage.Height; //32;
 
     var heights = new float[vertexCount, vertexCount];
-    float interpolation = 12;
+    float interpolation = 20;
 
     var vertexArray = new List<Vertex>();
 
     for (int i = 0; i < vertexCount; i++) {
       for (int j= 0; j < vertexCount; j++) {
-        float height = GetHeight(j, i, image, interpolation);
+        float height = GetHeight(j, i, skImage, interpolation);
         heights[j, i] = height;
 
         var vert = new Vector3(
@@ -89,7 +86,7 @@ public class Chunk : Component {
     var mesh = new TerrainMesh(
       vertexArray,
       indices,
-      Textures.Texture.LoadFromFile($"Resources/grassy2.png"),
+      Textures.Texture.FastTextureLoad($"Resources/grassy2.png"),
       heights,
       size,
       interpolation,
@@ -98,11 +95,12 @@ public class Chunk : Component {
     return mesh;
   }
 
-  static float GetHeight(int x, int y, Image<Rgba32> image, float interpolation = 1) {
-    if(x<0 || x>=image.Height || y<0 || y>=image.Height) {
+  static unsafe float GetHeight(int x, int y, SKBitmap image, float interpolation = 1) {
+    if (x<0 || x>= image.Height || y<0 || y>= image.Height) {
       return 0;
     }
-    float r = image[x, y].R;
+
+    float r = image.GetPixel(x, y).Red;
     float percentage = (r / 255) * interpolation;
     return percentage;
   }

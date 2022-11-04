@@ -15,14 +15,6 @@ public static class GuiDataState {
     _usingDebugWindow = value;
   }
 
-  public static Entity GetEntity() {
-    if(_targetEntity == null) {
-      _targetEntity = new Entity();
-      _targetEntity.SetName("No Entity Specified");
-    }
-    return _targetEntity;
-  }
-
   public static bool GetUsingDebugWindow() {
     return _usingDebugWindow;
   }

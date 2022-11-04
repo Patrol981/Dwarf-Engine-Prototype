@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using OpenTK.Core.Native;
 using Dwarf.Engine.Enums;
+using Dwarf.Engine.Physics;
 
 namespace Dwarf.Engine.DataStructures;
 
@@ -26,7 +27,7 @@ public class MeshRenderer : Component {
   }
 
   public Shader Shader {
-    get { return _shader; }
+    get { return _shader ?? null!; }
   }
 
   public Matrix4 WorldModel {
@@ -96,15 +97,9 @@ public class MeshRenderer : Component {
       );
     }
 
-    //Textures.Texture.LoadFromFile($"Resources/{masterMesh!.Owner!.GetName()}/{i}.png")
-    //_textures.Add(masterMesh.Meshes[i].Texture);
-    //_textures[i].Use(Textures.ETextureUnit.Texture0);
-    //_textures[i].Use((TextureUnit)Enum.Parse(typeof(TextureUnit), $"Texture0"));
     if (masterMesh.Meshes[i].Texture != null) {
       masterMesh.Meshes[i].Texture.Use((TextureUnit)Enum.Parse(typeof(TextureUnit), $"Texture0"));
     }
-
-    // var test = (TextureUnit)Enum.Parse(typeof(TextureUnit), $"Texture{i}");
 
     // position
     GL.EnableVertexAttribArray(0);
@@ -191,14 +186,13 @@ public class MeshRenderer : Component {
         }
       }
 
-      // _textures[i].Use((TextureUnit)Enum.Parse(typeof(TextureUnit), $"Texture0"));
       if(masterMesh.Meshes[i].Texture != null) {
         masterMesh.Meshes[i].Texture.Use((TextureUnit)Enum.Parse(typeof(TextureUnit), $"Texture0"));
       }
       _shader.Use();
 
       GL.BindVertexArray(_vao[i]);
-      switch(masterMesh.MeshRenderType) {
+      switch (masterMesh.MeshRenderType) {
         case MeshRenderType.Mesh:
           HandleMesh(masterMesh, i);
           break;
@@ -210,23 +204,46 @@ public class MeshRenderer : Component {
         default:
           break;
       }
-      
-
       GL.BindVertexArray(0);
       GL.ActiveTexture(TextureUnit.Texture0);
+
+      // Render Bounding Boxes
+      HandleBoundingBox(camera);
     }
     
   }
 
   private void HandleMesh(MasterMesh masterMesh, int index) {
+    if (!Owner!.GetComponent<MasterMesh>().Render) return;
+
     if (masterMesh.Meshes[index].Indices != null && masterMesh.Meshes[index].Indices.Count > 0) {
       GL.DrawElements(PrimitiveType.Triangles, masterMesh.Meshes[index].Indices.Count, DrawElementsType.UnsignedInt, 0);
     } else {
       GL.DrawArrays(PrimitiveType.Triangles, 0, masterMesh.Meshes[index].VertexArray.Count);
     }
+
+    /*
+    if (masterMesh.Meshes[index].Texture != null) {
+      GL.BindTexture(TextureTarget.Texture2D, 0);
+      GL.ActiveTexture(TextureUnit.Texture0);
+      masterMesh.Meshes[index].Texture.Use(TextureUnit.Texture0);
+    }
+
+    GL.BindVertexArray(0);
+    */
   }
 
   private void HandleLine(MasterMesh masterMesh, int index) {
+    if (!Owner!.GetComponent<MasterMesh>().Render) return;
+
     GL.DrawArrays(PrimitiveType.Lines, 0, masterMesh.Meshes[index].VertexArray.Count);
+  }
+
+  private void HandleBoundingBox(Camera camera) {
+    var boundingBox = Owner!.GetComponent<BoundingBox>();
+    if (boundingBox == null) return;
+    if (!boundingBox.Render) return;
+
+    boundingBox.Draw(camera);
   }
 }
