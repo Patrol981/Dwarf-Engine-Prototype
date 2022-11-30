@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -21,9 +21,6 @@
 	<PackageReference Include="StbImageSharp" Version="2.27.11" />
   </ItemGroup>
 
-	<ItemGroup>
-		<Reference Include="./DLL/*" />
-	</ItemGroup>
 
   <ItemGroup>
     <None Update="./Shaders/*">
@@ -41,14 +38,6 @@
 	 <None Update="./Resources/*/*/*">
        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	 </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Engine\DataStructures\ECS\Mesh\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\BulletSharpPInvoke-master\BulletSharp\BulletSharp.DotNetCore.csproj" />
   </ItemGroup>
 
   <ItemGroup>

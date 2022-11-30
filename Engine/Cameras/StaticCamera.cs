@@ -11,14 +11,10 @@ using Dwarf.Engine.ECS;
 
 namespace Dwarf.Engine.Cameras;
 public class StaticCamera : Camera, ICamera {
-  public StaticCamera(float aspectRatio): base(aspectRatio) {}
+  public StaticCamera(float aspectRatio) : base(aspectRatio) { }
 
   public StaticCamera() {
     WindowGlobalState.SetCursorVisible(false);
-  }
-
-  internal override void UpdateVectors() {
-    return;
   }
 
   public float GetAspectRatio() {
@@ -30,6 +26,5 @@ public class StaticCamera : Camera, ICamera {
   }
 
   public void HandleMovement() {
-    // throw new NotImplementedException();
   }
 }

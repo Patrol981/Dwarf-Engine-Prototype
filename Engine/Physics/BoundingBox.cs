@@ -97,6 +97,7 @@ public class BoundingBox : Component {
 		  void main(void)
 		  {
 			  gl_Position = vec4(aPosition, 1.0) * uModel * uView * uProjection;
+        // gl_Position = vec4(aPosition, 1.0) * uProjection;
 		  }";
 
   public static string fragmentCode = @" 

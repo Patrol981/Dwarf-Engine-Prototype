@@ -1,12 +1,10 @@
-﻿using Dwarf.Engine.ECS;
-using Dwarf.Engine.Windowing;
-using Dwarf.Engine.Globals;
-using OpenTK.Windowing.GraphicsLibraryFramework;
-using OpenTK.Mathematics;
-using Dwarf.Engine.Cameras;
-using Dwarf.Engine.Physics;
-using BulletSharp;
+﻿using Dwarf.Engine.Cameras;
 using Dwarf.Engine.DataStructures;
+using Dwarf.Engine.ECS;
+using Dwarf.Engine.Globals;
+using Dwarf.Engine.Physics;
+
+using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace Dwarf.Engine.Controllers;
 public class TransformController : Component {
@@ -27,8 +25,6 @@ public class TransformController : Component {
 
   public TransformController(float speed, MasterMesh masterMesh = null!) {
     _speed = speed;
-    //_terrain = (TerrainMesh)masterMesh.Meshes[0];
-    //_terrainPosition = masterMesh.Owner!;
   }
 
   private bool CollisionCheck() {
@@ -37,38 +33,11 @@ public class TransformController : Component {
     var myPos = Owner!.GetComponent<BoundingBox>().WorldModel.ExtractTranslation();
 
     var b = BoundingBox.Intersect(Owner!.GetComponent<BoundingBox>(), target[3].GetComponent<BoundingBox>());
-
-    Console.WriteLine(b);
-    //Console.WriteLine(myPos - pos);
     return b;
   }
 
   public void HandleMovement() {
     Camera camera = CameraGlobalState.GetCamera();
-    // Owner.GetComponent<Transform>().Rotation = camera.GetComponent<ThirdPersonCamera>().Front;
-    /*
-    _upwardsSpeed += _gravity * (float)WindowGlobalState.GetTime();
-    Owner!.GetComponent<Transform>().IncreasePosition(
-      new Vector3(0, _upwardsSpeed * (float)WindowGlobalState.GetTime(), 0)
-    );
-    var pos = Owner!.GetComponent<Transform>().Position;
-    float terrainHeight = _terrain.GetHeightOfTerrain(pos.X, pos.Z, _terrainPosition);
-    if (Owner!.GetComponent<Transform>().Position.Y < terrainHeight) {
-      _upwardsSpeed = 0;
-      Owner!.GetComponent<Transform>().Position.Y = terrainHeight;
-      _groundCheck = true;
-    }
-    */
-
-    //float front = 90 - ((camera.Yaw));
-    //float back = (camera.Yaw + 90) * -1;
-    //float left = (camera.Yaw + 180) * -1;
-    //float right = (camera.Yaw + 180);
-
-    //_right = 0;
-    //_back = 0;
-    //_left = 0;
-    //_front = 0;
 
     if (WindowGlobalState.GetKeyboardState().IsKeyDown(Keys.W)) {
       Owner!.GetComponent<Transform>().Position += (camera.Front) * _speed * (float)WindowGlobalState.GetTime();

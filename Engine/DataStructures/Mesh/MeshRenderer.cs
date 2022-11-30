@@ -159,13 +159,14 @@ public class MeshRenderer : Component {
 
     _shader.SetMatrix4("uModel", _worldModel);
 
-    for(int i = 0; i < masterMesh.Meshes.Count; i++) {
+    Span<Mesh> meshes = masterMesh.Meshes.ToArray();
+    for (int i = 0; i < meshes.Length; i++) {
 
       int diffuse = 1, specular = 1, normal = 1, height = 1;
-      if(masterMesh.Meshes[i].TextureArray != null) {
-        for (int j = 0; j < masterMesh.Meshes[i].TextureArray.Count; j++) {
+      if (meshes[i].TextureArray != null) {
+        for (int j = 0; j < meshes[i].TextureArray.Count; j++) {
           string number = "";
-          string name = masterMesh.Meshes[i].TextureArray[j].Type;
+          string name = meshes[i].TextureArray[j].Type;
 
           if (name == Assimp.TextureType.Diffuse.ToString()) {
             diffuse++;
@@ -182,23 +183,23 @@ public class MeshRenderer : Component {
           }
 
           GL.Uniform1(GL.GetUniformLocation(_shader.GetHandle(), $"{name}{number}"), j);
-          GL.BindTexture(TextureTarget.Texture2D, masterMesh.Meshes[i].TextureArray[j].Id);
+          GL.BindTexture(TextureTarget.Texture2D, meshes[i].TextureArray[j].Id);
         }
       }
 
-      if(masterMesh.Meshes[i].Texture != null) {
-        masterMesh.Meshes[i].Texture.Use((TextureUnit)Enum.Parse(typeof(TextureUnit), $"Texture0"));
+      if (meshes[i].Texture != null) {
+        meshes[i].Texture.Use((TextureUnit)Enum.Parse(typeof(TextureUnit), $"Texture0"));
       }
       _shader.Use();
 
       GL.BindVertexArray(_vao[i]);
       switch (masterMesh.MeshRenderType) {
         case MeshRenderType.Mesh:
-          HandleMesh(masterMesh, i);
+          HandleMesh(meshes[i]);
           break;
 
         case MeshRenderType.Line:
-          HandleLine(masterMesh, i);
+          HandleLine(meshes[i]);
           break;
 
         default:
@@ -210,33 +211,23 @@ public class MeshRenderer : Component {
       // Render Bounding Boxes
       HandleBoundingBox(camera);
     }
-    
+
   }
 
-  private void HandleMesh(MasterMesh masterMesh, int index) {
+  private void HandleMesh(Mesh mesh) {
     if (!Owner!.GetComponent<MasterMesh>().Render) return;
 
-    if (masterMesh.Meshes[index].Indices != null && masterMesh.Meshes[index].Indices.Count > 0) {
-      GL.DrawElements(PrimitiveType.Triangles, masterMesh.Meshes[index].Indices.Count, DrawElementsType.UnsignedInt, 0);
+    if (mesh.Indices != null && mesh.Indices.Count > 0) {
+      GL.DrawElements(PrimitiveType.Triangles, mesh.Indices.Count, DrawElementsType.UnsignedInt, 0);
     } else {
-      GL.DrawArrays(PrimitiveType.Triangles, 0, masterMesh.Meshes[index].VertexArray.Count);
+      GL.DrawArrays(PrimitiveType.Triangles, 0, mesh.VertexArray.Count);
     }
-
-    /*
-    if (masterMesh.Meshes[index].Texture != null) {
-      GL.BindTexture(TextureTarget.Texture2D, 0);
-      GL.ActiveTexture(TextureUnit.Texture0);
-      masterMesh.Meshes[index].Texture.Use(TextureUnit.Texture0);
-    }
-
-    GL.BindVertexArray(0);
-    */
   }
 
-  private void HandleLine(MasterMesh masterMesh, int index) {
+  private void HandleLine(Mesh mesh) {
     if (!Owner!.GetComponent<MasterMesh>().Render) return;
 
-    GL.DrawArrays(PrimitiveType.Lines, 0, masterMesh.Meshes[index].VertexArray.Count);
+    GL.DrawArrays(PrimitiveType.Lines, 0, mesh.VertexArray.Count);
   }
 
   private void HandleBoundingBox(Camera camera) {

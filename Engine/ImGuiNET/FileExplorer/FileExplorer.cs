@@ -33,6 +33,8 @@ public class FileEntity {
 
 public class FileExplorer {
 
+  private static FileExplorer? _instance { get; set; }
+
   private const string _fileIconName = "fileIcon.png";
   private const string _folderIconName = "folderIcon.png";
 
@@ -43,7 +45,6 @@ public class FileExplorer {
 
   private Texture _backTexture;
 
-  private int currItem;
   private ImGuiInputTextCallback? _textCallback;
 
   private byte[] _byteResponse = null!;
@@ -56,17 +57,11 @@ public class FileExplorer {
     _currentPath = Directory.GetCurrentDirectory();
 
     _drives = GetDrives().ToList();
-
-    //_textCallback = TextCallback;
-    _textCallback = new ImGuiInputTextCallback(TextCallback);
   }
 
   public void Update() {
-    // ImGui.GetWindowViewport();
 
     ImGui.Begin("File Explorer");
-
-    // ImGui.ImageButton((IntPtr)_backTexture.Handle, new System.Numerics.Vector2(64,64));
 
     if(ImGui.ArrowButton("left_btn", ImGuiDir.Left)) {
       GetParentDir(_currentPath);
@@ -77,19 +72,25 @@ public class FileExplorer {
     ImGui.SameLine();
     var buttonSize = ImGui.GetContentRegionAvail();
 
-    switch(_dialogMode) {
+    if(ImGui.Button("Cancel", new System.Numerics.Vector2(buttonSize.X / 2, 0))) {
+      FileExplorer.CloseExplorer();
+    }
+
+    ImGui.SameLine();
+
+    switch (_dialogMode) {
       case DialogMode.Open:
-        if(ImGui.Button("Open", new System.Numerics.Vector2(buttonSize.X, 0))) {
+        if(ImGui.Button("Open", new System.Numerics.Vector2(buttonSize.X / 2, 0))) {
           HandleOpen();
         }
         break;
       case DialogMode.Save:
-        if(ImGui.Button("Save", new System.Numerics.Vector2(buttonSize.X, 0))) {
+        if(ImGui.Button("Save", new System.Numerics.Vector2(buttonSize.X / 2, 0))) {
           HandleSave();
         }
         break;
       case DialogMode.Select:
-        if (ImGui.Button("Select", new System.Numerics.Vector2(buttonSize.X, 0))) {
+        if (ImGui.Button("Select", new System.Numerics.Vector2(buttonSize.X / 2, 0))) {
           HandleSelect();
         }
         break;
@@ -97,17 +98,8 @@ public class FileExplorer {
         break;
     }
 
-    
-
-    string[] test = {
-      "",
-      ""
-    };
-
-
     // Left
     ImGui.BeginChild("left panel", new System.Numerics.Vector2(150, 0), true);
-
 
     foreach (var drive in _drives) {
       if(ImGui.Selectable(drive.Name)) {
@@ -116,7 +108,6 @@ public class FileExplorer {
     }
 
     ImGui.EndChild();
-
     ImGui.SameLine();
 
     ImGui.BeginGroup();
@@ -221,5 +212,17 @@ public class FileExplorer {
 
   public void OpenDialog(string label, DialogMode mode) {
     _dialogMode = mode;
+  }
+
+  public static FileExplorer? GetFileExplorer() {
+    return _instance;
+  }
+
+  public static void CloseExplorer() {
+    _instance = null;
+  }
+
+  public static void SetupExplorer(DialogMode mode) {
+    _instance = new FileExplorer(mode);
   }
 }

@@ -1,10 +1,9 @@
-using OpenTK.Mathematics;
-using System;
-
 using Dwarf.Engine.ECS;
 
+using OpenTK.Mathematics;
+
 namespace Dwarf.Engine.Cameras;
- public abstract class Camera : Component {
+public abstract class Camera : Component {
   // Those vectors are directions pointing outwards from the camera to define how it rotated.
   protected Vector3 _front = -Vector3.UnitZ;
 
@@ -56,14 +55,16 @@ namespace Dwarf.Engine.Cameras;
     }
   }
 
-  public Matrix4 GetViewMatrix() {
+  public virtual Matrix4 GetViewMatrix() {
     Vector3 position = Owner!.GetComponent<Transform>().Position;
     return Matrix4.LookAt(position, position + _front, _up);
   }
 
-  public Matrix4 GetProjectionMatrix() {
+  public virtual Matrix4 GetProjectionMatrix() {
     return Matrix4.CreatePerspectiveFieldOfView(_fov, AspectRatio, 0.01f, 100f);
   }
 
-  internal abstract void UpdateVectors();
+  internal virtual void UpdateVectors() {
+
+  }
 }

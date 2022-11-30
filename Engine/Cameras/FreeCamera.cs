@@ -1,13 +1,10 @@
-using OpenTK.Windowing.Common;
-using OpenTK.Windowing.GraphicsLibraryFramework;
-using OpenTK.Graphics.OpenGL;
-using OpenTK.Graphics;
-using OpenTK.Windowing.Desktop;
-using OpenTK.Mathematics;
-
-using Dwarf.Engine.Globals;
-using Dwarf.Engine.Enums;
 using Dwarf.Engine.ECS;
+using Dwarf.Engine.Enums;
+using Dwarf.Engine.Globals;
+
+using OpenTK.Graphics.OpenGL;
+using OpenTK.Mathematics;
+using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace Dwarf.Engine.Cameras;
 
@@ -21,44 +18,44 @@ public class FreeCamera : Camera, ICamera {
   }
 
   public void HandleMovement() {
-    if(CameraGlobalState.GetFirstMove()) {
+    if (CameraGlobalState.GetFirstMove()) {
       CameraGlobalState.SetFirstMove(false);
       CameraGlobalState.SetLastPosition(new Vector2(WindowGlobalState.GetMouseState().Position.X, WindowGlobalState.GetMouseState().Position.Y));
     } else {
       var deltaX = WindowGlobalState.GetMouseState().Position.X - CameraGlobalState.GetLastPosition().X;
       var deltaY = WindowGlobalState.GetMouseState().Position.Y - CameraGlobalState.GetLastPosition().Y;
       CameraGlobalState.SetLastPosition(new Vector2(WindowGlobalState.GetMouseState().Position.X, WindowGlobalState.GetMouseState().Position.Y));
-      
-      if(!WindowGlobalState.GetCursorVisible()) {
+
+      if (!WindowGlobalState.GetCursorVisible()) {
         Yaw += deltaX * CameraGlobalState.GetSensitivity();
         Pitch -= deltaY * CameraGlobalState.GetSensitivity();
       }
-      
+
     }
 
-    if(WindowGlobalState.GetKeyboardState().IsKeyDown(Keys.W)) {
+    if (WindowGlobalState.GetKeyboardState().IsKeyDown(Keys.W)) {
       Owner!.GetComponent<Transform>().Position += Front * CameraGlobalState.GetCameraSpeed() * (float)WindowGlobalState.GetTime();
     }
-    if(WindowGlobalState.GetKeyboardState().IsKeyDown(Keys.S)) {
+    if (WindowGlobalState.GetKeyboardState().IsKeyDown(Keys.S)) {
       Owner!.GetComponent<Transform>().Position -= Front * CameraGlobalState.GetCameraSpeed() * (float)WindowGlobalState.GetTime();
     }
-    if(WindowGlobalState.GetKeyboardState().IsKeyDown(Keys.A)) {
+    if (WindowGlobalState.GetKeyboardState().IsKeyDown(Keys.A)) {
       Owner!.GetComponent<Transform>().Position -= Right * CameraGlobalState.GetCameraSpeed() * (float)WindowGlobalState.GetTime();
     }
-    if(WindowGlobalState.GetKeyboardState().IsKeyDown(Keys.D)) {
+    if (WindowGlobalState.GetKeyboardState().IsKeyDown(Keys.D)) {
       Owner!.GetComponent<Transform>().Position += Right * CameraGlobalState.GetCameraSpeed() * (float)WindowGlobalState.GetTime();
     }
 
-    if(WindowGlobalState.GetKeyboardState().IsKeyDown(Keys.LeftShift)) {
+    if (WindowGlobalState.GetKeyboardState().IsKeyDown(Keys.LeftShift)) {
       Owner!.GetComponent<Transform>().Position += WorldUp * CameraGlobalState.GetCameraSpeed() * (float)WindowGlobalState.GetTime();
     }
-    if(WindowGlobalState.GetKeyboardState().IsKeyDown(Keys.Space)) {
+    if (WindowGlobalState.GetKeyboardState().IsKeyDown(Keys.Space)) {
       Owner!.GetComponent<Transform>().Position -= WorldUp * CameraGlobalState.GetCameraSpeed() * (float)WindowGlobalState.GetTime();
     }
 
-    if(WindowGlobalState.GetKeyboardState().IsKeyPressed(Keys.Tab)) {
+    if (WindowGlobalState.GetKeyboardState().IsKeyPressed(Keys.Tab)) {
       var currentRenderMode = CameraGlobalState.GetWindowRenderMode();
-      switch(currentRenderMode) {
+      switch (currentRenderMode) {
         case WindowRenderMode.Normal:
           GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
           CameraGlobalState.SetWindowRenderMode(WindowRenderMode.Wireframe);
@@ -70,9 +67,9 @@ public class FreeCamera : Camera, ICamera {
       }
     }
 
-    if(WindowGlobalState.GetKeyboardState().IsKeyPressed(Keys.F)) {
+    if (WindowGlobalState.GetKeyboardState().IsKeyPressed(Keys.F)) {
       var currentCursorState = WindowGlobalState.GetCursorVisible();
-      switch(currentCursorState) {
+      switch (currentCursorState) {
         case true:
           WindowGlobalState.SetCursorVisible(false);
           break;
@@ -84,7 +81,7 @@ public class FreeCamera : Camera, ICamera {
   }
 
   internal override void UpdateVectors() {
-    if(WindowGlobalState.GetCursorVisible()) {
+    if (WindowGlobalState.GetCursorVisible()) {
       return;
     }
     // First, the front matrix is calculated using some basic trigonometry.

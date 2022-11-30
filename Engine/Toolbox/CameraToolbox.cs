@@ -33,6 +33,13 @@ public static class CameraToolbox {
     CameraGlobalState.SetCameraEntity(camera);
   }
 
+  public static void CreateOrthograpbicCamera(ref Entity camera, ref Window window) {
+    camera.AddComponent(new Transform(new Vector3(0, 0, 0)));
+    camera.AddComponent(new OrtographicCamera(window.Size.X / (float)window.Size.Y));
+    CameraGlobalState.SetCamera(camera.GetComponent<OrtographicCamera>());
+    CameraGlobalState.SetCameraEntity(camera);
+  }
+
   public static void RemoveCamera<T>(ref Entity camera) where T: Component {
     camera.RemoveComponent<T>();
   }

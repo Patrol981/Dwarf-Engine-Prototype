@@ -70,7 +70,7 @@ public class Mesh : Component {
 
     var count = posList.Count;
 
-    for (int i=0; i<count; i++) {
+    for (int i = 0; i < count; i++) {
       Vertex v = new Vertex();
 
       v.Position = posList[i];
@@ -100,10 +100,6 @@ public class Mesh : Component {
     _indices = indices;
 
     _texture = texture;
-
-    if(texture != null) {
-      // _shader = new Shader("Shaders/texture.vert", "Shaders/texture.frag");
-    }
   }
 
   public Mesh() {

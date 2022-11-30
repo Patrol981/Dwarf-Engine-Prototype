@@ -2,6 +2,7 @@ using Dwarf.Engine.DataStructures.Enums;
 using Dwarf.Engine.ECS;
 using Dwarf.Engine.Loaders;
 using Dwarf.Engine.Physics;
+
 using OpenTK.Mathematics;
 
 namespace Dwarf.Engine.DataStructures;
@@ -9,7 +10,7 @@ namespace Dwarf.Engine.DataStructures;
 public enum EntityType {
   Entity,
   Terrain
-} 
+}
 
 public class Entity {
   private ComponentManager _componentManager;
@@ -39,7 +40,6 @@ public class Entity {
     Vector3 position
   ) where T : Entity, new() {
     T entity = new T();
-    // var entity = new Entity();
     entity.Name = name;
     entity.AddComponent(new Transform(position));
 
