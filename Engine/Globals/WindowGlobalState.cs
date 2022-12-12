@@ -8,89 +8,89 @@ using OpenTK.Mathematics;
 namespace Dwarf.Engine.Globals;
 
 public static class WindowGlobalState {
-  private static double _time;
-  private static MouseState? _mouseState;
-  private static KeyboardState? _keyboardState;
-  private static bool _cursorVisible = true;
-  private static Cursor _cursor;
-  private static CursorState _cursorState = CursorState.Normal;
-  private static Vector2 _lastLockedCursorPosition = new Vector2(0,0);
-  private static Windowing.Window? _window;
+  private static double s_time;
+  private static MouseState? s_mouseState;
+  private static KeyboardState? s_keyboardState;
+  private static bool s_cursorVisible = true;
+  private static Cursor s_cursor;
+  private static CursorState s_cursorState = CursorState.Normal;
+  private static Vector2 s_lastLockedCursorPosition = new Vector2(0, 0);
+  private static Windowing.Window? s_window;
 
   public static void SetWindow(Windowing.Window window) {
-    _window = window;
+    s_window = window;
   }
 
   public static void SetTime(double time) {
-    _time = time;
+    s_time = time;
   }
 
   public static void SetMouseState(MouseState mouseState) {
-    _mouseState = mouseState;
+    s_mouseState = mouseState;
   }
 
   public static void SetKeyboardState(KeyboardState keyboardState) {
-    _keyboardState = keyboardState;
+    s_keyboardState = keyboardState;
   }
 
   public static void SetCursorVisible(bool value) {
-    _cursorVisible = value;
+    s_cursorVisible = value;
   }
 
   public static void SetCursor(Cursor cursor) {
-    _cursor = cursor;
+    s_cursor = cursor;
   }
 
   public static void SetCursorState(CursorState cursorState) {
-    _cursorState = cursorState;
+    s_cursorState = cursorState;
   }
 
   public static void SetCursorLastLockedPosition(Vector2 position) {
-    _lastLockedCursorPosition = position;
+    s_lastLockedCursorPosition = position;
   }
 
   public static Windowing.Window GetWindow() {
-    return _window;
+    return s_window;
   }
 
   public static double GetTime() {
-    return _time;
+    return s_time;
   }
 
   public static MouseState GetMouseState() {
-    if(_mouseState == null) {
+    if (s_mouseState == null) {
       return null!;
     }
-    return _mouseState;
+    return s_mouseState;
   }
 
   public static KeyboardState GetKeyboardState() {
-    if(_keyboardState == null) {
+    if (s_keyboardState == null) {
       return null!;
     }
-    return _keyboardState;
+    return s_keyboardState;
   }
 
   public static CursorState GetCursorState() {
-    return _cursorState;
+    return s_cursorState;
   }
 
   public static bool GetCursorVisible() {
-    return _cursorVisible;
+    return s_cursorVisible;
   }
 
   public static bool GetCursorGrabbed() {
-    if(_cursorVisible) {
+    if (s_cursorVisible) {
       return false;
     }
     return true;
   }
 
   public static Cursor GetCursor() {
-    return _cursor;
+    return s_cursor;
   }
 
   public static Vector2 GetCursorLastLockedPosition() {
-    return _lastLockedCursorPosition;
+    return s_lastLockedCursorPosition;
   }
 }

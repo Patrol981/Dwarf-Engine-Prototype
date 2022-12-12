@@ -99,13 +99,14 @@ public class EngineClass {
     var camera = (ICamera)CameraGlobalState.GetCamera();
     camera.HandleMovement();
 
-    _skybox.Update((Camera)camera);
+    // _skybox.Update((Camera)camera);
 
     Span<Entity> entities = CollectionsMarshal.AsSpan<Entity>(Scene.Entities);
     ref var searchEntities = ref MemoryMarshal.GetReference(entities);
     for (var i = 0; i < entities.Length; i++) {
       var item = Unsafe.Add(ref searchEntities, i);
       item.GetComponent<MeshRenderer>()?.Render((Camera)camera);
+      item.GetComponent<SpriteRenderer>()?.Render((Camera)camera);
     }
   }
 

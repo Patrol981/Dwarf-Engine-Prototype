@@ -2,6 +2,7 @@
 using Dwarf.Engine.DataStructures;
 using Dwarf.Engine.ECS;
 using SkiaSharp;
+using Dwarf.Engine.Globals;
 
 namespace Dwarf.Engine.Generators;
 public class Chunk : Component {
@@ -26,7 +27,7 @@ public class Chunk : Component {
     List<Vector2> textureCoords = new();
     List<int> indices = new();
 
-    var buff = File.ReadAllBytes("Resources/heightmap.png");
+    var buff = File.ReadAllBytes($"{WindowSettings.GetGlobalPath()}/Resources/heightmap.png");
 
     var skImage = SKBitmap.Decode(buff);
 
@@ -38,7 +39,7 @@ public class Chunk : Component {
     var vertexArray = new List<Vertex>();
 
     for (int i = 0; i < vertexCount; i++) {
-      for (int j= 0; j < vertexCount; j++) {
+      for (int j = 0; j < vertexCount; j++) {
         float height = GetHeight(j, i, skImage, interpolation);
         heights[j, i] = height;
 
@@ -68,8 +69,8 @@ public class Chunk : Component {
       }
     }
 
-    for(int gz = 0; gz < vertexCount -1; gz++) {
-      for(int gx = 0; gx < vertexCount - 1; gx++) {
+    for (int gz = 0; gz < vertexCount - 1; gz++) {
+      for (int gx = 0; gx < vertexCount - 1; gx++) {
         int topLeft = (gz * vertexCount) + gx;
         int topRight = topLeft + 1;
         int bottomLeft = ((gz + 1) * vertexCount) + gx;
@@ -86,7 +87,7 @@ public class Chunk : Component {
     var mesh = new TerrainMesh(
       vertexArray,
       indices,
-      Textures.Texture.FastTextureLoad($"Resources/grassy2.png"),
+      Textures.Texture.FastTextureLoad($"{WindowSettings.GetGlobalPath()}/Resources/grassy2.png"),
       heights,
       size,
       interpolation,
@@ -96,7 +97,7 @@ public class Chunk : Component {
   }
 
   static unsafe float GetHeight(int x, int y, SKBitmap image, float interpolation = 1) {
-    if (x<0 || x>= image.Height || y<0 || y>= image.Height) {
+    if (x < 0 || x >= image.Height || y < 0 || y >= image.Height) {
       return 0;
     }
 

@@ -152,10 +152,11 @@ public class MeshRenderer : Component {
     var angleX = (float)MathHelper.DegreesToRadians(Owner.GetComponent<Transform>().Rotation.X);
     var angleY = (float)MathHelper.DegreesToRadians(Owner.GetComponent<Transform>().Rotation.Y);
     var angleZ = (float)MathHelper.DegreesToRadians(Owner.GetComponent<Transform>().Rotation.Z);
+    var scale = Owner.GetComponent<Transform>().Scale;
 
     _model = Matrix4.CreateRotationX(angleX) * Matrix4.CreateRotationY(angleY) * Matrix4.CreateRotationZ(angleZ);
 
-    _worldModel = _model * Matrix4.CreateTranslation(modelPos);
+    _worldModel = _model * Matrix4.CreateTranslation(modelPos) * Matrix4.CreateScale(scale);
 
     _shader.SetMatrix4("uModel", _worldModel);
 

@@ -1,6 +1,7 @@
 ﻿using Assimp;
 using OpenTK.Mathematics;
 using Dwarf.Engine.DataStructures;
+using Dwarf.Engine.Globals;
 
 namespace Dwarf.Engine.Loaders;
 public class GenericLoader : MeshLoader {
@@ -32,16 +33,16 @@ public class GenericLoader : MeshLoader {
 
     var node = scene.RootNode;
 
-    for(int i=0; i<node.ChildCount; i++) {
+    for (int i = 0; i < node.ChildCount; i++) {
       ProcessNode(node.Children[i], scene);
     }
-    
+
 
     return new MasterMesh(_meshes);
   }
 
   private void ProcessNode(Node node, Scene scene) {
-    for(int i=0; i<node.MeshCount; i++) {
+    for (int i = 0; i < node.MeshCount; i++) {
       var aMesh = scene.Meshes[node.MeshIndices[i]];
       _meshes.Add(ProcessMesh(aMesh, scene));
     }
@@ -54,7 +55,7 @@ public class GenericLoader : MeshLoader {
 
     var vertexArray = new List<Vertex>();
 
-    for (int i=0; i<mesh.Vertices.Count; i++) {
+    for (int i = 0; i < mesh.Vertices.Count; i++) {
       Vertex v = new();
       Vector3 vec = new();
       vec.X = mesh.Vertices[i].X;
@@ -62,20 +63,20 @@ public class GenericLoader : MeshLoader {
       vec.Z = mesh.Vertices[i].Z;
       v.Position = vec;
 
-      if(mesh.HasNormals) {
+      if (mesh.HasNormals) {
         vec.X = mesh.Normals[i].X;
         vec.Y = mesh.Normals[i].Y;
         vec.Z = mesh.Normals[i].Z;
         v.Normal = vec;
       }
 
-      if(mesh.HasTextureCoords(0)) {
+      if (mesh.HasTextureCoords(0)) {
         Vector2 vec2 = new();
         vec2.X = mesh.TextureCoordinateChannels[0][i].X;
         vec2.Y = mesh.TextureCoordinateChannels[0][i].Y;
         v.TextureCoords = vec2;
 
-        if(mesh.HasTangentBasis) {
+        if (mesh.HasTangentBasis) {
           vec.X = mesh.Tangents[i].X;
           vec.Y = mesh.Tangents[i].Y;
           vec.Z = mesh.Tangents[i].Z;
@@ -93,10 +94,10 @@ public class GenericLoader : MeshLoader {
       vertices.Add(v);
     }
 
-    for(int i = 0; i < mesh.FaceCount; i++) {
+    for (int i = 0; i < mesh.FaceCount; i++) {
       var aFace = mesh.Faces[i];
 
-      for(int j=0; j<aFace.IndexCount; j++) {
+      for (int j = 0; j < aFace.IndexCount; j++) {
         indices.Add(aFace.Indices[j]);
       }
     }
@@ -128,21 +129,21 @@ public class GenericLoader : MeshLoader {
     List<Textures.TextureStruct> materialTextures = new List<Textures.TextureStruct>();
 
     var count = material.GetMaterialTextureCount(textureType);
-    for (int i=0; i<count; i++) {
+    for (int i = 0; i < count; i++) {
       material.GetMaterialTexture(textureType, i, out Assimp.TextureSlot textureSlot);
       bool skip = false;
-      for(int j=0; j<_textures.Count; j++) {
-        if(_textures[j].Path == textureSlot.FilePath) {
+      for (int j = 0; j < _textures.Count; j++) {
+        if (_textures[j].Path == textureSlot.FilePath) {
           materialTextures.Add(_textures[j]);
           skip = true;
           break;
         }
       }
-      if(!skip) {
+      if (!skip) {
         string[] filename = textureSlot.FilePath.Split('.');
 
         Textures.TextureStruct textureStruct;
-        textureStruct.Id = Textures.Texture.FastTextureLoad($"Resources/{filename[0]}/{textureSlot.FilePath}").Handle;
+        textureStruct.Id = Textures.Texture.FastTextureLoad($"{WindowSettings.GetGlobalPath()}/Resources/{filename[0]}/{textureSlot.FilePath}").Handle;
         textureStruct.Type = typeName.ToString();
         textureStruct.Path = textureSlot.FilePath;
         materialTextures.Add(textureStruct);

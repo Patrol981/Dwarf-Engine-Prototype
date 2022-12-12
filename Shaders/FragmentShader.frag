@@ -8,7 +8,7 @@ in vec3 vNormal;
 
 uniform vec3 uViewPos;
 uniform vec3 uDiffuse;
-uniform sampler2D texture1;
+uniform sampler2D texture0;
 
 const int toonColorLevels = 4;
 const float toonScaleFactor = 1.0f / toonColorLevels;
@@ -22,5 +22,5 @@ void main()
 
     float cc = max(abs(dot(viewDir,norm)), 0.3f);
     vec3 res = vec3(cc*uDiffuse);
-    vFragColor = texture(texture1, texCoord) * vec4(res, 1);
+    vFragColor = texture(texture0, texCoord) * vec4(res, 1);
 }

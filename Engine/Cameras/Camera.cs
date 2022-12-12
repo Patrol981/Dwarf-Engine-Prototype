@@ -21,6 +21,7 @@ public abstract class Camera : Component {
   public Vector3 Front => _front;
   public Vector3 Up => _up;
   public Vector3 Right => _right;
+
   public Vector3 WorldUp = new Vector3(0f, 1f, 0f);
 
   public Camera(float aspectRatio) {

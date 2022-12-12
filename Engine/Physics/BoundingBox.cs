@@ -31,9 +31,9 @@ public class OrientedBoundingBox {
       center + rotation * max,
     };
 
-    Right = rotation * new Vector3(1,0,0);
-    Up = rotation * new Vector3(0,1,0);
-    Forward = rotation * new Vector3(0,0,1);
+    Right = rotation * new Vector3(1, 0, 0);
+    Up = rotation * new Vector3(0, 1, 0);
+    Forward = rotation * new Vector3(0, 0, 1);
   }
 }
 
@@ -79,7 +79,7 @@ public class BoundingBox : Component {
        0.5f, 0.5f, 0.5f, 1.0f,
       -0.5f, 0.5f, 0.5f, 1.0f,
     };
-  
+
 
   ushort[] _indices = {
       0, 1, 2, 3,
@@ -175,7 +175,7 @@ public class BoundingBox : Component {
   }
 
   static bool Separated(Vector3[] vA, Vector3[] vB, Vector3 axis) {
-    if(axis == Vector3.Zero) {
+    if (axis == Vector3.Zero) {
       return false;
     }
 
@@ -209,7 +209,7 @@ public class BoundingBox : Component {
 
       var targetObb = ToObb(targetBB);
 
-      if(Intersects(myObb, targetObb)) resultList.Add(entities[i]);
+      if (Intersects(myObb, targetObb)) resultList.Add(entities[i]);
 
       /*
       bool x = MathF.Abs(myPos.X - targetPos.X) * 2 < (b.Size.X + targetBB.Size.X);
@@ -308,12 +308,13 @@ public class BoundingBox : Component {
     var angleX = (float)MathHelper.DegreesToRadians(Owner.GetComponent<Transform>().Rotation.X);
     var angleY = (float)MathHelper.DegreesToRadians(Owner.GetComponent<Transform>().Rotation.Y);
     var angleZ = (float)MathHelper.DegreesToRadians(Owner.GetComponent<Transform>().Rotation.Z);
+    var scale = Owner.GetComponent<Transform>().Scale;
 
     // apply rotation matrix to bounding box
     // _transform = ;
 
     _model = _transform * Matrix4.CreateRotationX(angleX) * Matrix4.CreateRotationY(angleY) * Matrix4.CreateRotationZ(angleZ);
-    _worldModel = _model * Matrix4.CreateTranslation(modelPos);
+    _worldModel = _model * Matrix4.CreateTranslation(modelPos) * Matrix4.CreateScale(scale);
     _shader.SetMatrix4("uModel", _worldModel);
 
     _shader.SetVector3("uDiffuse", new Vector3(127, 255, 0));

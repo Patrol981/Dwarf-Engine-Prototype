@@ -39,11 +39,4 @@
        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	 </None>
   </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="PhysX.Net">
-      <HintPath>DLL\PhysX.Net.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
 </Project>

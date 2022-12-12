@@ -22,7 +22,7 @@ public class Window : GameWindow {
   private GUIController _controller;
 
   public Window(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings)
-    : base(gameWindowSettings, nativeWindowSettings) {}
+    : base(gameWindowSettings, nativeWindowSettings) { }
 
 
   public void BindUpdateCallback(onEventCallback callback) {
@@ -67,7 +67,7 @@ public class Window : GameWindow {
     //  return;
     //}
 
-    switch(WindowGlobalState.GetCursorVisible()) {
+    switch (WindowGlobalState.GetCursorVisible()) {
       case true:
         //CursorVisible = WindowGlobalState.GetCursorVisible();
         CursorState = CursorState.Normal;
@@ -109,12 +109,12 @@ public class Window : GameWindow {
   protected override void OnLoad() {
     base.OnLoad();
 
-    if(Debugging.Debugger.UseDebbuger) {
+    if (Debugging.Debugger.UseDebbuger) {
       GL.DebugMessageCallback(Debugging.Debugger.DebugMessageDelegate, IntPtr.Zero);
       GL.Enable(EnableCap.DebugOutput);
       GL.Enable(EnableCap.DebugOutputSynchronous);
     }
-    
+
     GL.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     // Clipping
     GL.Enable(EnableCap.DepthTest);

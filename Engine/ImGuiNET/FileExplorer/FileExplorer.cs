@@ -2,6 +2,7 @@
 using System.IO;
 using ImGuiNET;
 using System.Diagnostics;
+using Dwarf.Engine.Globals;
 
 namespace Dwarf.Engine.ImGuiNET.FileExplorer;
 
@@ -51,7 +52,7 @@ public class FileExplorer {
 
   public unsafe FileExplorer(DialogMode dialogMode) {
     _dialogMode = dialogMode;
-    _backTexture = Texture.FastTextureLoad("Resources/ico/backIcon.png", 0);
+    _backTexture = Texture.FastTextureLoad($"{WindowSettings.GetEnginePath()}/Resources/ico/backIcon.png", 0);
 
     _filesInFolder = GetFilesWithinDirectory(Directory.GetCurrentDirectory());
     _currentPath = Directory.GetCurrentDirectory();
@@ -63,16 +64,16 @@ public class FileExplorer {
 
     ImGui.Begin("File Explorer");
 
-    if(ImGui.ArrowButton("left_btn", ImGuiDir.Left)) {
+    if (ImGui.ArrowButton("left_btn", ImGuiDir.Left)) {
       GetParentDir(_currentPath);
     }
     ImGui.SameLine();
-    
+
     ImGui.InputText("", ref _currentPath, 128, ImGuiInputTextFlags.None, _textCallback);
     ImGui.SameLine();
     var buttonSize = ImGui.GetContentRegionAvail();
 
-    if(ImGui.Button("Cancel", new System.Numerics.Vector2(buttonSize.X / 2, 0))) {
+    if (ImGui.Button("Cancel", new System.Numerics.Vector2(buttonSize.X / 2, 0))) {
       FileExplorer.CloseExplorer();
     }
 
@@ -80,12 +81,12 @@ public class FileExplorer {
 
     switch (_dialogMode) {
       case DialogMode.Open:
-        if(ImGui.Button("Open", new System.Numerics.Vector2(buttonSize.X / 2, 0))) {
+        if (ImGui.Button("Open", new System.Numerics.Vector2(buttonSize.X / 2, 0))) {
           HandleOpen();
         }
         break;
       case DialogMode.Save:
-        if(ImGui.Button("Save", new System.Numerics.Vector2(buttonSize.X / 2, 0))) {
+        if (ImGui.Button("Save", new System.Numerics.Vector2(buttonSize.X / 2, 0))) {
           HandleSave();
         }
         break;
@@ -102,7 +103,7 @@ public class FileExplorer {
     ImGui.BeginChild("left panel", new System.Numerics.Vector2(150, 0), true);
 
     foreach (var drive in _drives) {
-      if(ImGui.Selectable(drive.Name)) {
+      if (ImGui.Selectable(drive.Name)) {
         _filesInFolder = GetFilesWithinDirectory(drive.RootDirectory.FullName);
       }
     }
@@ -146,9 +147,9 @@ public class FileExplorer {
   }
 
   public void GetParentDir(string parent) {
-    if(parent == null) return;
+    if (parent == null) return;
     var newPath = Directory.GetParent(parent);
-    if(newPath == null) return;
+    if (newPath == null) return;
     _currentPath = newPath.FullName;
     _filesInFolder = GetFilesWithinDirectory(_currentPath);
   }
@@ -170,7 +171,7 @@ public class FileExplorer {
       fileEntity.IsFolder = fileEntity.Ext.Length <= 0;
 
       var icon = Texture.FastTextureLoad(
-        $"Resources/ico/{(fileEntity.IsFolder == true ? _folderIconName : _fileIconName)}",
+        $"{WindowSettings.GetEnginePath()}/Resources/ico/{(fileEntity.IsFolder == true ? _folderIconName : _fileIconName)}",
         0
       );
 
